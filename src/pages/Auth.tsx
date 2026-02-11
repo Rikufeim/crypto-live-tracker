@@ -33,13 +33,13 @@ const Auth = () => {
         });
         if (error) throw error;
         toast({
-          title: "Tarkista sähköpostisi",
-          description: "Lähetimme sinulle vahvistuslinkin.",
+          title: "Check your email",
+          description: "We sent you a confirmation link.",
         });
       }
     } catch (error: any) {
       toast({
-        title: "Virhe",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -60,7 +60,7 @@ const Auth = () => {
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors"
         >
           <ArrowLeft size={16} />
-          <span className="text-sm font-bold">Takaisin</span>
+          <span className="text-sm font-bold">Back</span>
         </button>
 
         <div className="flex items-center gap-3 mb-10">
@@ -73,12 +73,12 @@ const Auth = () => {
         </div>
 
         <h1 className="text-3xl font-black tracking-tight mb-2">
-          {isLogin ? "Kirjaudu sisään" : "Luo tili"}
+          {isLogin ? "Log in" : "Create account"}
         </h1>
         <p className="text-muted-foreground mb-8">
           {isLogin
-            ? "Tervetuloa takaisin terminaaliin."
-            : "Aloita kryptojen reaaliaikainen seuranta."}
+            ? "Welcome back to the terminal."
+            : "Start tracking your crypto in real time."}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -87,7 +87,7 @@ const Auth = () => {
               <User className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
               <input
                 type="text"
-                placeholder="Nimi"
+                placeholder="Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full bg-card border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground font-medium focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all placeholder:text-muted-foreground"
@@ -98,7 +98,7 @@ const Auth = () => {
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <input
               type="email"
-              placeholder="Sähköposti"
+              placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -109,7 +109,7 @@ const Auth = () => {
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <input
               type="password"
-              placeholder="Salasana"
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -123,17 +123,17 @@ const Auth = () => {
             disabled={loading}
             className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-black text-lg transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 glow-primary"
           >
-            {loading ? "Ladataan..." : isLogin ? "Kirjaudu" : "Rekisteröidy"}
+            {loading ? "Loading..." : isLogin ? "Log in" : "Sign up"}
           </button>
         </form>
 
         <p className="text-center text-muted-foreground mt-6 text-sm">
-          {isLogin ? "Eikö sinulla ole tiliä?" : "Onko sinulla jo tili?"}{" "}
+          {isLogin ? "Don’t have an account?" : "Already have an account?"}{" "}
           <button
             onClick={() => setIsLogin(!isLogin)}
             className="text-primary font-bold hover:underline"
           >
-            {isLogin ? "Rekisteröidy" : "Kirjaudu sisään"}
+            {isLogin ? "Sign up" : "Log in"}
           </button>
         </p>
       </div>

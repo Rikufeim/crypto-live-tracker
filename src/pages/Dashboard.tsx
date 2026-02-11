@@ -26,10 +26,21 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [liveTicks, setLiveTicks] = useState<Record<string, number>>({});
+  const [amountInputs, setAmountInputs] = useState<Record<string, string>>({});
 
   const coinIds = useMemo(() => holdings.map((h) => h.coin_id), [holdings]);
   const { marketData } = useMarketData(coinIds, currency);
   const top50 = useTop50(currency, isAddModalOpen);
+
+  // Sync local amount input values with holdings
+  useEffect(() => {
+    const initial: Record<string, string> = {};
+    holdings.forEach((h) => {
+      initial[h.id] =
+        h.amount !== undefined && h.amount !== null ? h.amount.toString() : "";
+    });
+    setAmountInputs(initial);
+  }, [holdings]);
 
   // Live tick simulation
   useEffect(() => {
@@ -47,26 +58,63 @@ const Dashboard = () => {
 
   // Stats calculation
   const stats = useMemo(() => {
-    let totalValue = 0, totalCost = 0, delta24h = 0;
+    let totalValue = 0,
+      totalCost = 0,
+      delta24h = 0;
+
     const assets = holdings.map((h) => {
-      const m = marketData[h.coin_id] || { current_price: 0, price_change_percentage_24h: 0, symbol: "?", name: "Loading...", image: "", market_cap_rank: 0 };
+      const m =
+        marketData[h.coin_id] || {
+          current_price: 0,
+          price_change_percentage_24h: 0,
+          symbol: "?",
+          name: "Loading...",
+          image: "",
+          market_cap_rank: 0,
+        };
+
       const livePrice = (m.current_price || 0) * (liveTicks[h.coin_id] || 1);
-      const val = h.amount * livePrice;
-      const cost = h.amount * (h.avg_buy_price || 0);
+
+      // Use local input value for real-time calculations when available
+      const rawAmount =
+        amountInputs[h.id] ??
+        (h.amount || h.amount === 0 ? h.amount.toString() : "");
+      const parsedAmount = parseFloat(
+        typeof rawAmount === "string" ? rawAmount.replace(",", ".") : String(rawAmount)
+      );
+      const effectiveAmount = Number.isFinite(parsedAmount) ? parsedAmount : 0;
+
+      const val = effectiveAmount * livePrice;
+      const cost = effectiveAmount * (h.avg_buy_price || 0);
       totalValue += val;
       totalCost += cost;
-      const prevPrice = (m.current_price || 0) / (1 + ((m.price_change_percentage_24h || 0) / 100));
-      delta24h += val - h.amount * prevPrice;
-      return { ...m, ...h, current_price: livePrice, currentValue: val, profit: val - cost, profitPct: cost > 0 ? ((val - cost) / cost) * 100 : 0 };
+
+      const prevPrice =
+        (m.current_price || 0) /
+        (1 + ((m.price_change_percentage_24h || 0) / 100));
+      delta24h += val - effectiveAmount * prevPrice;
+
+      return {
+        ...m,
+        ...h,
+        amount: effectiveAmount,
+        current_price: livePrice,
+        currentValue: val,
+        profit: val - cost,
+        profitPct: cost > 0 ? ((val - cost) / cost) * 100 : 0,
+      };
     });
 
     return {
       assets: assets.sort((a, b) => b.currentValue - a.currentValue),
-      totalValue, totalProfit: totalValue - totalCost,
+      totalValue,
+      totalProfit: totalValue - totalCost,
       totalProfitPct: totalCost > 0 ? ((totalValue - totalCost) / totalCost) * 100 : 0,
-      delta24h, delta24hPct: totalValue > 0 ? (delta24h / (totalValue - delta24h)) * 100 : 0,
+      delta24h,
+      delta24hPct:
+        totalValue > 0 ? (delta24h / (totalValue - delta24h)) * 100 : 0,
     };
-  }, [holdings, marketData, liveTicks]);
+  }, [holdings, marketData, liveTicks, amountInputs]);
 
   const formatCurrency = (val: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: val < 1 ? 4 : 2 }).format(val || 0);
@@ -74,8 +122,9 @@ const Dashboard = () => {
   const handleAdd = async (coin: any) => {
     if (!isPremium && holdings.length >= FREE_HOLDING_LIMIT) {
       toast({
-        title: "Premium vaaditaan",
-        description: "Ilmaisessa versiossa voit seurata vain yhtä kryptoa. Päivitä Premiumiin saadaksesi rajattomasti trackauksia.",
+        title: "Premium required",
+        description:
+          "In the free plan you can track only one crypto. Upgrade to Premium to unlock unlimited tracking.",
         variant: "destructive",
       });
       setIsAddModalOpen(false);
@@ -95,7 +144,7 @@ const Dashboard = () => {
       if (error) throw error;
       if (data?.url) window.open(data.url, "_blank");
     } catch (err: any) {
-      toast({ title: "Virhe", description: err.message, variant: "destructive" });
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
@@ -105,7 +154,7 @@ const Dashboard = () => {
       if (error) throw error;
       if (data?.url) window.open(data.url, "_blank");
     } catch (err: any) {
-      toast({ title: "Virhe", description: err.message, variant: "destructive" });
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
@@ -125,7 +174,7 @@ const Dashboard = () => {
           {[
             { id: "dashboard", icon: Layers, label: "Dashboard" },
             { id: "assets", icon: Briefcase, label: "Portfolio" },
-            { id: "settings", icon: Settings, label: "Asetukset" },
+            { id: "settings", icon: Settings, label: "Settings" },
           ].map((item) => (
             <button
               key={item.id}
@@ -148,14 +197,17 @@ const Dashboard = () => {
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse-glow" />
             <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Network Secure</span>
           </div>
-          <button onClick={signOut} className="text-xs font-black uppercase text-muted-foreground hover:text-destructive transition-colors text-left">
-            Kirjaudu ulos
+          <button
+            onClick={signOut}
+            className="text-xs font-black uppercase text-muted-foreground hover:text-destructive transition-colors text-left"
+          >
+            Sign out
           </button>
         </div>
       </aside>
 
       {/* Main */}
-      <main className="lg:ml-72 flex-1 pb-24 lg:pb-10 min-h-screen">
+      <main className="lg:ml-72 flex-1 pb-20 lg:pb-10 min-h-screen">
         <header className="sticky top-0 z-30 glass px-8 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3 px-4 py-2 bg-muted rounded-2xl border border-border">
             <Briefcase size={16} className="text-primary" />
@@ -169,8 +221,11 @@ const Dashboard = () => {
                 </button>
               ))}
             </div>
-            <button onClick={() => setIsAddModalOpen(true)} className="bg-primary text-primary-foreground px-8 py-2.5 rounded-2xl text-sm font-black flex items-center gap-2 transition-all active:scale-95 glow-primary">
-              <Plus size={18} /> Lisää
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="bg-primary text-primary-foreground px-8 py-2.5 rounded-2xl text-sm font-black flex items-center gap-2 transition-all active:scale-95 glow-primary"
+            >
+              <Plus size={18} /> Add
             </button>
           </div>
         </header>
@@ -211,48 +266,92 @@ const Dashboard = () => {
                   <div className="py-32 text-center border-2 border-dashed border-border rounded-[40px] bg-card/30">
                     <Briefcase size={64} className="mx-auto mb-6 text-muted-foreground/30" />
                     <h4 className="text-2xl font-black mb-2 uppercase">Empty Terminal</h4>
-                    <p className="text-muted-foreground mb-10">Lisää ensimmäinen krypto aloittaaksesi.</p>
-                    <button onClick={() => setIsAddModalOpen(true)} className="bg-primary text-primary-foreground px-12 py-4 rounded-3xl font-black glow-primary">
-                      Lisää krypto
+                    <p className="text-muted-foreground mb-10">Add your first crypto to get started.</p>
+                    <button
+                      onClick={() => setIsAddModalOpen(true)}
+                      className="bg-primary text-primary-foreground px-12 py-4 rounded-3xl font-black glow-primary"
+                    >
+                      Add crypto
                     </button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-12 px-8 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                    <div className="grid grid-cols-12 px-8 text-[11px] font-black text-muted-foreground uppercase tracking-[0.25em]">
                       <div className="col-span-4">Asset</div>
-                      <div className="col-span-2">Hinta</div>
-                      <div className="col-span-2">Määrä</div>
-                      <div className="col-span-2">Arvo</div>
+                      <div className="col-span-2">Price</div>
+                      <div className="col-span-2 text-center">Amount</div>
+                      <div className="col-span-2 text-right">Value</div>
                       <div className="col-span-2 text-right">24H</div>
                     </div>
                     {stats.assets.map((asset) => (
                       <div
                         key={asset.id}
                         onClick={() => setSelectedCoin(asset.coin_id)}
-                        className={`grid grid-cols-12 items-center px-8 py-6 rounded-3xl glass hover:border-primary/30 transition-all cursor-pointer group relative ${selectedCoin === asset.coin_id ? "ring-2 ring-primary/40" : ""}`}
+                        className={`relative grid grid-cols-12 items-center px-8 py-5 rounded-[30px] border border-border/70 bg-gradient-to-r from-card/90 via-card/70 to-card/60 shadow-[0_18px_45px_rgba(0,0,0,0.65)] transition-all cursor-pointer group ${
+                          selectedCoin === asset.coin_id
+                            ? "ring-2 ring-primary/40 border-primary/40 shadow-[0_22px_55px_rgba(0,255,200,0.35)]"
+                            : "hover:border-primary/30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.9)] hover:-translate-y-0.5"
+                        }`}
                       >
-                        {selectedCoin === asset.coin_id && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-3xl" />}
                         <div className="col-span-4 flex items-center gap-5">
-                          <img src={asset.image} alt="" className="w-12 h-12 rounded-full ring-2 ring-border group-hover:ring-primary/50 transition-all" />
+                          <img
+                            src={asset.image}
+                            alt=""
+                            className="w-12 h-12 rounded-full ring-2 ring-border/70 group-hover:ring-primary/60 transition-all"
+                          />
                           <div>
-                            <div className="font-black text-lg group-hover:text-primary transition-colors">{asset.name}</div>
-                            <div className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">{asset.symbol} • #{asset.market_cap_rank}</div>
+                            <div className="font-black text-lg tracking-tight group-hover:text-primary transition-colors">
+                              {asset.name}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.25em]">
+                              {asset.symbol} • #{asset.market_cap_rank}
+                            </div>
                           </div>
                         </div>
-                        <div className="col-span-2 font-mono text-base font-bold tabular-nums text-secondary-foreground">{formatCurrency(asset.current_price)}</div>
-                        <div className="col-span-2">
+                        <div className="col-span-2 font-mono text-base font-bold tabular-nums text-secondary-foreground">
+                          {formatCurrency(asset.current_price)}
+                        </div>
+                        <div className="col-span-2 flex justify-center">
                           <input
-                            type="number"
-                            value={asset.amount}
-                            step="any"
+                            type="text"
+                            value={
+                              amountInputs[asset.id] ??
+                              (asset.amount || asset.amount === 0
+                                ? asset.amount.toString()
+                                : "")
+                            }
                             onClick={(e) => e.stopPropagation()}
-                            onChange={(e) => updateAmount(asset.id, parseFloat(e.target.value) || 0)}
-                            className="bg-background border border-border rounded-xl px-3 py-2 w-28 text-sm font-black focus:border-primary outline-none transition-all"
+                            onChange={(e) => {
+                              const normalizedValue = e.target.value.replace(",", ".");
+                              setAmountInputs((prev) => ({
+                                ...prev,
+                                [asset.id]: normalizedValue,
+                              }));
+                            }}
+                            onBlur={(e) => {
+                              const normalizedValue = e.target.value.replace(",", ".");
+                              const parsed = parseFloat(normalizedValue);
+                              const safeValue = Number.isFinite(parsed) ? parsed : 0;
+                              updateAmount(asset.id, safeValue);
+                              setAmountInputs((prev) => ({
+                                ...prev,
+                                [asset.id]: normalizedValue,
+                              }));
+                            }}
+                            className="bg-background/80 border border-border/80 rounded-2xl px-4 py-2 w-full max-w-[140px] text-sm font-black text-center focus:border-primary outline-none transition-all focus:bg-background"
                           />
                         </div>
-                        <div className="col-span-2 font-black text-xl tabular-nums tracking-tighter">{formatCurrency(asset.currentValue)}</div>
-                        <div className="col-span-2 text-right">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-black border uppercase tracking-widest ${(asset.price_change_percentage_24h ?? 0) >= 0 ? "bg-positive/10 text-positive border-positive/20" : "bg-negative/10 text-negative border-negative/20"}`}>
+                        <div className="col-span-2 font-black text-xl tabular-nums tracking-tight text-right">
+                          {formatCurrency(asset.currentValue)}
+                        </div>
+                        <div className="col-span-2 flex justify-end">
+                          <span
+                            className={`px-3 py-1.5 rounded-full text-[10px] font-black border uppercase tracking-[0.2em] ${
+                              (asset.price_change_percentage_24h ?? 0) >= 0
+                                ? "bg-positive/10 text-positive border-positive/20"
+                                : "bg-negative/10 text-negative border-negative/20"
+                            }`}
+                          >
                             {asset.price_change_percentage_24h?.toFixed(2)}%
                           </span>
                         </div>
@@ -285,12 +384,17 @@ const Dashboard = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-6 pb-6 border-b border-border">
                     <div>
-                      <p className="text-[10px] text-muted-foreground font-black uppercase mb-1 tracking-widest">Määrä</p>
-                      <p className="font-black text-lg tabular-nums">{asset.amount} <span className="text-[10px] opacity-40 uppercase">{asset.symbol}</span></p>
+                      <p className="text-[10px] text-muted-foreground font-black uppercase mb-1 tracking-widest">Amount</p>
+                      <p className="font-black text-lg tabular-nums">
+                        {asset.amount}{" "}
+                        <span className="text-[10px] opacity-40 uppercase">{asset.symbol}</span>
+                      </p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-muted-foreground font-black uppercase mb-1 tracking-widest">Arvo</p>
-                      <p className="font-black text-lg tabular-nums text-primary">{formatCurrency(asset.currentValue)}</p>
+                      <p className="text-[10px] text-muted-foreground font-black uppercase mb-1 tracking-widest">Value</p>
+                      <p className="font-black text-lg tabular-nums text-primary">
+                        {formatCurrency(asset.currentValue)}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center justify-between pt-5">
@@ -306,7 +410,7 @@ const Dashboard = () => {
 
           {activeTab === "settings" && (
             <div className="max-w-4xl space-y-10">
-              <h3 className="text-4xl font-black tracking-tight">Asetukset</h3>
+              <h3 className="text-4xl font-black tracking-tight">Settings</h3>
 
               {/* Premium upgrade / manage */}
               <div className={`glass rounded-3xl p-8 ${isPremium ? "border-primary/30" : "border-primary/10"}`}>
@@ -315,19 +419,29 @@ const Dashboard = () => {
                     <Crown size={28} />
                   </div>
                   <div>
-                    <p className="font-black text-lg">{isPremium ? "Premium-tilaus aktiivinen" : "Päivitä Premiumiin"}</p>
+                    <p className="font-black text-lg">
+                      {isPremium ? "Premium subscription active" : "Upgrade to Premium"}
+                    </p>
                     <p className="text-sm text-muted-foreground">
-                      {isPremium ? "Rajaton kryptojen seuranta käytössä." : `Seuraa rajattomasti kryptoja vain ${STRIPE_CONFIG.premium.price}€/${STRIPE_CONFIG.premium.interval}.`}
+                      {isPremium
+                        ? "Unlimited crypto tracking enabled."
+                        : `Track unlimited cryptos for only ${STRIPE_CONFIG.premium.price}€/${STRIPE_CONFIG.premium.interval}.`}
                     </p>
                   </div>
                 </div>
                 {isPremium ? (
-                  <button onClick={handleManageSubscription} className="px-8 py-3 rounded-2xl border border-border font-bold text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all">
-                    Hallitse tilausta
+                  <button
+                    onClick={handleManageSubscription}
+                    className="px-8 py-3 rounded-2xl border border-border font-bold text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
+                  >
+                    Manage subscription
                   </button>
                 ) : (
-                  <button onClick={handleCheckout} className="bg-primary text-primary-foreground px-8 py-3 rounded-2xl font-black transition-all hover:opacity-90 active:scale-[0.98] glow-primary flex items-center gap-2">
-                    Päivitä Premiumiin <ChevronRight size={18} />
+                  <button
+                    onClick={handleCheckout}
+                    className="bg-primary text-primary-foreground px-8 py-3 rounded-2xl font-black transition-all hover:opacity-90 active:scale-[0.98] glow-primary flex items-center gap-2"
+                  >
+                    Upgrade to Premium <ChevronRight size={18} />
                   </button>
                 )}
               </div>
@@ -340,8 +454,8 @@ const Dashboard = () => {
                       <Globe size={28} />
                     </div>
                     <div>
-                      <p className="font-black text-lg">Valuutta</p>
-                      <p className="text-sm text-muted-foreground">Vaihda seurantavaluuttaa</p>
+                      <p className="font-black text-lg">Currency</p>
+                      <p className="text-sm text-muted-foreground">Change portfolio currency</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -361,11 +475,13 @@ const Dashboard = () => {
                       <Shield size={28} />
                     </div>
                     <div>
-                      <p className="font-black text-lg">Pilvisalaus</p>
-                      <p className="text-sm text-muted-foreground">Päästä-päähän salaus</p>
+                      <p className="font-black text-lg">Cloud encryption</p>
+                      <p className="text-sm text-muted-foreground">End-to-end encryption</p>
                     </div>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black border uppercase tracking-widest bg-positive/10 text-positive border-positive/20">Käytössä</span>
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black border uppercase tracking-widest bg-positive/10 text-positive border-positive/20">
+                    Enabled
+                  </span>
                 </div>
               </div>
             </div>
@@ -381,13 +497,26 @@ const Dashboard = () => {
             <div className="flex items-center justify-center w-24 h-24 bg-destructive/10 text-destructive rounded-full mx-auto mb-8 border border-destructive/20">
               <AlertTriangle size={48} />
             </div>
-            <h3 className="text-3xl font-black text-center mb-3">Vahvista poisto</h3>
+            <h3 className="text-3xl font-black text-center mb-3">Confirm deletion</h3>
             <p className="text-muted-foreground text-center text-lg mb-10">
-              Poistetaanko <span className="text-foreground font-black">{deleteTarget.name}</span>?
+              Delete <span className="text-foreground font-black">{deleteTarget.name}</span>?
             </p>
             <div className="grid grid-cols-2 gap-4">
-              <button onClick={() => setDeleteTarget(null)} className="px-8 py-5 bg-muted rounded-3xl font-black hover:bg-secondary transition-all border border-border">Peruuta</button>
-              <button onClick={async () => { await deleteHolding(deleteTarget.id); setDeleteTarget(null); }} className="px-8 py-5 bg-destructive rounded-3xl font-black hover:opacity-90 transition-all text-destructive-foreground">Poista</button>
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="px-8 py-5 bg-muted rounded-3xl font-black hover:bg-secondary transition-all border border-border"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  await deleteHolding(deleteTarget.id);
+                  setDeleteTarget(null);
+                }}
+                className="px-8 py-5 bg-destructive rounded-3xl font-black hover:opacity-90 transition-all text-destructive-foreground"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
@@ -399,13 +528,21 @@ const Dashboard = () => {
           <div className="absolute inset-0 bg-background/90 backdrop-blur-lg" onClick={() => setIsAddModalOpen(false)} />
           <div className="glass w-full max-w-2xl relative z-10 rounded-3xl p-10 border-primary/20">
             <div className="flex items-center justify-between mb-10">
-              <h3 className="text-3xl font-black tracking-tight uppercase">Hae kryptoa</h3>
+              <h3 className="text-3xl font-black tracking-tight uppercase">Search crypto</h3>
               <button onClick={() => setIsAddModalOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors p-2"><X size={32} /></button>
             </div>
             {!isPremium && holdings.length >= FREE_HOLDING_LIMIT && (
               <div className="mb-6 p-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-sm text-destructive">
-                <p className="font-bold">Ilmaisessa versiossa voit seurata vain yhtä kryptoa.</p>
-                <button onClick={() => { setIsAddModalOpen(false); setActiveTab("settings"); }} className="text-primary font-black underline mt-1">Päivitä Premiumiin →</button>
+                <p className="font-bold">In the free plan you can track only one crypto.</p>
+                <button
+                  onClick={() => {
+                    setIsAddModalOpen(false);
+                    setActiveTab("settings");
+                  }}
+                  className="text-primary font-black underline mt-1"
+                >
+                  Upgrade to Premium →
+                </button>
               </div>
             )}
             <div className="relative mb-10">
@@ -435,7 +572,9 @@ const Dashboard = () => {
                   </div>
                   <div className="text-right">
                     <div className="text-lg font-black font-mono">{formatCurrency(coin.current_price)}</div>
-                    <div className="text-[10px] text-primary font-black uppercase opacity-0 group-hover:opacity-100 mt-1 tracking-widest">+ Lisää</div>
+                    <div className="text-[10px] text-primary font-black uppercase opacity-0 group-hover:opacity-100 mt-1 tracking-widest">
+                      + Add
+                    </div>
                   </div>
                 </button>
               ))}
