@@ -70,7 +70,7 @@ const Landing = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <button
               onClick={() => navigate("/auth")}
-              className="bg-primary text-primary-foreground px-10 py-4 rounded-2xl text-lg font-black transition-all hover:opacity-90 active:scale-95 flex items-center gap-3 justify-center glow-primary">
+              className="text-primary-foreground px-10 py-4 rounded-2xl text-lg font-black transition-all hover:opacity-90 active:scale-95 flex items-center gap-3 justify-center glow-primary bg-primary">
 
               Get started free <ChevronRight size={20} />
             </button>
