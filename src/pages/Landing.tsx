@@ -151,9 +151,9 @@ const Landing = () => {
 
           {/* Premium */}
           <div className="glass rounded-3xl p-8 flex flex-col border-primary/30 relative overflow-hidden">
-            <div className="absolute top-0 right-0 px-4 py-1.5 bg-primary text-primary-foreground text-xs font-black uppercase tracking-widest rounded-bl-2xl">
-              Most popular
-            </div>
+            
+
+
             <h3 className="text-xl font-black mb-1">Premium</h3>
             <div className="flex items-baseline gap-1 mb-6">
               <span className="text-4xl font-black">
