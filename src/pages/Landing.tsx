@@ -5,30 +5,27 @@ import {
   Check, X as XIcon } from
 "lucide-react";
 import { STRIPE_CONFIG } from "@/lib/constants";
+import { AuthStarsBackground } from "@/components/ui/auth-stars-background";
 
 const features = [
 { icon: Zap, title: "One-second updates", desc: "Real-time price tracking with 1s refresh." },
 { icon: TrendingUp, title: "TradingView charts", desc: "Professional-grade charts built into the app." },
 { icon: Shield, title: "Cloud sync", desc: "Your portfolio is always safe and in sync." },
-{ icon: Globe, title: "50+ cryptos", desc: "Track your favorites in a single dashboard." }];
+{ icon: Globe, title: "Portfolio tracker", desc: "Track your favorites in a single dashboard." }];
 
 
 const Landing = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-hidden">
-      {/* BG effects */}
-      <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-primary/8 rounded-full blur-[180px] -z-10 animate-float" />
-      <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-primary/4 rounded-full blur-[150px] -z-10" />
+    <div className="relative min-h-screen text-foreground overflow-hidden">
+      <AuthStarsBackground />
 
-      {/* Nav */}
-      <nav className="fixed top-0 w-full z-50 glass px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+      <div className="relative z-10">
+        {/* Hero – nav only in hero, scrolls away with it */}
+        <section className="pt-6 pb-20 px-6 text-center">
+        <nav className="w-full max-w-6xl mx-auto flex items-center justify-between mb-16 md:mb-24">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-              <Activity size={20} className="text-primary-foreground" />
-            </div>
             <span className="text-xl font-black tracking-tighter">
               LIVE<span className="text-primary">TRACK</span>
             </span>
@@ -42,16 +39,12 @@ const Landing = () => {
             </button>
             <button
               onClick={() => navigate("/auth")}
-              className="px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-black transition-all hover:opacity-90 active:scale-95">
+              className="px-5 py-2.5 bg-primary text-white text-outline-soft rounded-xl text-sm font-black transition-all hover:opacity-90 active:scale-95">
 
               Get started free
             </button>
           </div>
-        </div>
-      </nav>
-
-      {/* Hero */}
-      <section className="pt-32 pb-20 px-6 text-center">
+        </nav>
         <div className="max-w-4xl mx-auto space-y-8">
           
 
@@ -70,7 +63,7 @@ const Landing = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <button
               onClick={() => navigate("/auth")}
-              className="text-primary-foreground px-10 py-4 rounded-2xl text-lg font-black transition-all hover:opacity-90 active:scale-95 flex items-center gap-3 justify-center glow-primary bg-primary">
+              className="text-white text-outline-soft px-10 py-4 rounded-2xl text-lg font-black transition-all hover:opacity-90 active:scale-95 flex items-center gap-3 justify-center bg-primary">
 
               Get started free <ChevronRight size={20} />
             </button>
@@ -82,10 +75,10 @@ const Landing = () => {
             </a>
           </div>
         </div>
-      </section>
+        </section>
 
-      {/* Features */}
-      <section className="py-20 px-6">
+        {/* Features */}
+        <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           {features.map((f, i) =>
           <div
@@ -100,10 +93,10 @@ const Landing = () => {
             </div>
           )}
         </div>
-      </section>
+        </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="py-20 px-6">
+        {/* Pricing */}
+        <section id="pricing" className="py-20 px-6">
         <div className="max-w-4xl mx-auto text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Simple pricing
@@ -163,6 +156,7 @@ const Landing = () => {
             </div>
             <ul className="space-y-3 flex-1 mb-8">
               {[
+              "Portfolio tracker",
               "Unlimited crypto tracking",
               "Real-time prices",
               "TradingView charts",
@@ -177,25 +171,29 @@ const Landing = () => {
             </ul>
             <button
               onClick={() => navigate("/auth")}
-              className="w-full py-3.5 rounded-2xl bg-primary text-primary-foreground font-black transition-all hover:opacity-90 active:scale-[0.98] glow-primary">
+              className="w-full py-3.5 rounded-2xl bg-primary text-white text-outline-soft font-black transition-all hover:opacity-90 active:scale-[0.98]">
 
               Start Premium
             </button>
           </div>
         </div>
-      </section>
+        </section>
 
-      {/* Footer */}
-      <footer className="py-10 px-6 border-t border-border">
-        <div className="max-w-6xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Activity size={16} className="text-primary" />
-            <span className="font-bold">LiveTrack</span>
+        {/* Footer */}
+        <footer className="py-10 px-6 border-t border-border">
+          <div className="max-w-6xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Activity size={16} className="text-primary" />
+              <span className="font-bold text-white">
+                LIVE<span className="text-primary">TRACK</span>
+              </span>
+            </div>
+            <span>© {new Date().getFullYear()} LIVE<span className="text-primary">TRACK</span>. All rights reserved.</span>
           </div>
-          <span>© {new Date().getFullYear()} LiveTrack. All rights reserved.</span>
-        </div>
-      </footer>
-    </div>);
+        </footer>
+      </div>
+    </div>
+  );
 
 };
 

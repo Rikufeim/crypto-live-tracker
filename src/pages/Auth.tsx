@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Activity, Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AuthStarsBackground } from "@/components/ui/auth-stars-background";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -49,35 +50,37 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px]" />
-      <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-primary/3 rounded-full blur-[100px]" />
+    <div className="relative min-h-screen flex items-center justify-center p-6 overflow-hidden">
+      <AuthStarsBackground />
 
-      <div className="w-full max-w-md relative z-10">
-        <button
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors"
-        >
-          <ArrowLeft size={16} />
-          <span className="text-sm font-bold">Back</span>
-        </button>
-
-        <div className="flex items-center gap-3 mb-10">
-          <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center glow-primary">
-            <Activity size={24} className="text-primary-foreground" />
-          </div>
+      {/* Top nav */}
+      <div className="absolute top-0 left-0 right-0 z-20 px-6 py-4 auth-nav-bg flex items-center justify-between">
+        <div className="flex-1 flex justify-start">
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm font-bold transition-colors"
+          >
+            <ArrowLeft size={16} />
+            <span>Back</span>
+          </button>
+        </div>
+        <div className="flex-1 flex justify-center">
           <span className="text-2xl font-black tracking-tighter">
             LIVE<span className="text-primary">TRACK</span>
           </span>
         </div>
+        <div className="flex-1 flex justify-end" />
+      </div>
+
+      {/* Auth card */}
+      <div className="w-full max-w-md relative z-10 pt-12">
 
         <h1 className="text-3xl font-black tracking-tight mb-2">
           {isLogin ? "Log in" : "Create account"}
         </h1>
         <p className="text-muted-foreground mb-8">
           {isLogin
-            ? "Welcome back to the terminal."
+            ? "Welcome back, boss."
             : "Start tracking your crypto in real time."}
         </p>
 
@@ -121,7 +124,7 @@ const Auth = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-black text-lg transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 glow-primary"
+            className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-black text-lg transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
           >
             {loading ? "Loading..." : isLogin ? "Log in" : "Sign up"}
           </button>

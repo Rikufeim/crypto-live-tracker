@@ -8,10 +8,19 @@ import { FREE_HOLDING_LIMIT, STRIPE_CONFIG } from "@/lib/constants";
 import TradingViewWidget from "@/components/TradingViewWidget";
 import {
   Activity, Layers, Briefcase, Settings, Plus, Search, X,
-  Trash2, AlertTriangle, Zap, TrendingUp, TrendingDown,
+  Trash2, AlertTriangle, Zap, TrendingUp, TrendingDown, ChevronLeft,
   Globe, Shield, Info, ChevronRight, Crown,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+type TradeEntry = {
+  id: string;
+  asset: string;
+  date: string;
+  amount: string;
+  price: string;
+  note: string;
+};
 
 const Dashboard = () => {
   const { user, isPremium, signOut, checkSubscription } = useAuth();
@@ -21,12 +30,58 @@ const Dashboard = () => {
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [currency, setCurrency] = useState("USD");
-  const [selectedCoin, setSelectedCoin] = useState("bitcoin");
+  const [selectedCoin, setSelectedCoin] = useState("xrp");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [liveTicks, setLiveTicks] = useState<Record<string, number>>({});
   const [amountInputs, setAmountInputs] = useState<Record<string, string>>({});
+  const [portfolioName, setPortfolioName] = useState("Main Portfolio");
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [chartSearch, setChartSearch] = useState("xrp");
+  const [buys, setBuys] = useState<TradeEntry[]>([
+    { id: "buy-1", asset: "", date: "", amount: "", price: "", note: "" },
+  ]);
+  const [sells, setSells] = useState<TradeEntry[]>([
+    { id: "sell-1", asset: "", date: "", amount: "", price: "", note: "" },
+  ]);
+
+  // Persist portfolio name and trade tables per user in browser storage
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const raw = localStorage.getItem(`livetrack:dashboard:${user.id}`);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as {
+        portfolioName?: string;
+        buys?: TradeEntry[];
+        sells?: TradeEntry[];
+      };
+      if (parsed.portfolioName) setPortfolioName(parsed.portfolioName);
+      if (parsed.buys && parsed.buys.length) setBuys(parsed.buys);
+      if (parsed.sells && parsed.sells.length) setSells(parsed.sells);
+    } catch (e) {
+      console.error("Failed to load dashboard state", e);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const payload = {
+        portfolioName,
+        buys,
+        sells,
+      };
+      localStorage.setItem(
+        `livetrack:dashboard:${user.id}`,
+        JSON.stringify(payload)
+      );
+    } catch (e) {
+      console.error("Failed to save dashboard state", e);
+    }
+  }, [user, portfolioName, buys, sells]);
 
   const coinIds = useMemo(() => holdings.map((h) => h.coin_id), [holdings]);
   const { marketData } = useMarketData(coinIds, currency);
@@ -116,8 +171,52 @@ const Dashboard = () => {
     };
   }, [holdings, marketData, liveTicks, amountInputs]);
 
+  const demoMonthlyData = [
+    { label: "Sept.", value: 8200 },
+    { label: "Oct.", value: 5400 },
+    { label: "Nov.", value: 6800 },
+    { label: "Dec.", value: 3600 },
+    { label: "Jan.", value: 4100 },
+    { label: "Feb.", value: 7600 },
+    { label: "Mar.", value: 2900 },
+  ];
+
   const formatCurrency = (val: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: val < 1 ? 4 : 2 }).format(val || 0);
+
+  const updateTradeEntry = (
+    type: "buys" | "sells",
+    id: string,
+    field: keyof TradeEntry,
+    value: string
+  ) => {
+    const setter = type === "buys" ? setBuys : setSells;
+    setter((prev) =>
+      prev.map((entry) =>
+        entry.id === id ? { ...entry, [field]: value } : entry
+      )
+    );
+  };
+
+  const addTradeEntry = (type: "buys" | "sells") => {
+    const setter = type === "buys" ? setBuys : setSells;
+    setter((prev) => [
+      ...prev,
+      {
+        id: `${type}-${Date.now()}-${prev.length + 1}`,
+        asset: "",
+        date: "",
+        amount: "",
+        price: "",
+        note: "",
+      },
+    ]);
+  };
+
+  const removeTradeEntry = (type: "buys" | "sells", id: string) => {
+    const setter = type === "buys" ? setBuys : setSells;
+    setter((prev) => prev.filter((entry) => entry.id !== id));
+  };
 
   const handleAdd = async (coin: any) => {
     if (!isPremium && holdings.length >= FREE_HOLDING_LIMIT) {
@@ -163,55 +262,114 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden flex">
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-72 bg-sidebar border-r border-sidebar-border hidden lg:flex flex-col p-8 z-40">
-        <div className="flex items-center gap-4 mb-14">
-          <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center glow-primary">
-            <Activity size={28} className="text-primary-foreground" />
-          </div>
-          <span className="text-2xl font-black tracking-tighter">LIVE<span className="text-primary">TRACK</span></span>
+      <aside
+        className={`fixed left-0 top-0 bottom-0 bg-sidebar border-r border-sidebar-border hidden lg:flex flex-col z-40 transition-all duration-300 ${
+          isSidebarCollapsed ? "w-16 p-3" : "w-56 p-6"
+        }`}
+      >
+        <div
+          className={`flex items-center mb-14 ${
+            isSidebarCollapsed ? "justify-center" : "justify-start"
+          }`}
+        >
+          {!isSidebarCollapsed ? (
+            <span className="text-2xl font-black tracking-tighter">
+              LIVE<span className="text-primary">TRACK</span>
+            </span>
+          ) : (
+            <span className="text-xl font-black tracking-tighter">
+              L<span className="text-primary">T</span>
+            </span>
+          )}
         </div>
-        <nav className="space-y-3 flex-1">
+        <nav className="space-y-2 flex-1">
           {[
             { id: "dashboard", icon: Layers, label: "Dashboard" },
             { id: "assets", icon: Briefcase, label: "Portfolio" },
+            { id: "buys", icon: TrendingUp, label: "Buys" },
+            { id: "sells", icon: TrendingDown, label: "Sells" },
             { id: "settings", icon: Settings, label: "Settings" },
           ].map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all ${activeTab === item.id ? "bg-primary/10 text-primary border border-primary/20" : "text-sidebar-foreground hover:text-foreground hover:bg-muted"}`}
+              className={`w-full flex items-center gap-3 py-3 rounded-xl transition-all ${
+                isSidebarCollapsed ? "justify-center" : "justify-start px-4"
+              } ${
+                activeTab === item.id
+                  ? "text-primary"
+                  : "text-sidebar-foreground hover:text-foreground"
+              }`}
             >
               <item.icon size={22} />
-              <span className="font-bold">{item.label}</span>
+              {!isSidebarCollapsed && (
+                <span className="font-bold">{item.label}</span>
+              )}
             </button>
           ))}
         </nav>
         <div className="pt-8 border-t border-sidebar-border space-y-4">
-          {isPremium && (
-            <div className="flex items-center gap-2 text-primary">
-              <Crown size={14} />
-              <span className="text-[10px] font-black uppercase tracking-widest">Premium</span>
-            </div>
-          )}
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-primary rounded-full animate-pulse-glow" />
-            <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Network Secure</span>
-          </div>
           <button
-            onClick={signOut}
-            className="text-xs font-black uppercase text-muted-foreground hover:text-destructive transition-colors text-left"
+            type="button"
+            onClick={() => setIsSidebarCollapsed((v) => !v)}
+            className="w-8 h-8 rounded-full border border-sidebar-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
           >
-            Sign out
+            {isSidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
           </button>
+          {!isSidebarCollapsed && (
+            <>
+              {isPremium && (
+                <div className="flex items-center gap-2 text-primary">
+                  <Crown size={14} />
+                  <span className="text-[10px] font-black uppercase tracking-widest">
+                    Premium
+                  </span>
+                </div>
+              )}
+              <button
+                onClick={signOut}
+                className="text-xs font-black uppercase text-muted-foreground hover:text-destructive transition-colors text-left"
+              >
+                Sign out
+              </button>
+            </>
+          )}
         </div>
       </aside>
 
       {/* Main */}
-      <main className="lg:ml-72 flex-1 pb-20 lg:pb-10 min-h-screen">
-        <header className="sticky top-0 z-30 glass px-8 py-6 flex items-center justify-between">
-          <div className="flex items-center gap-3 px-4 py-2 bg-muted rounded-2xl border border-border">
-            <Briefcase size={16} className="text-primary" />
-            <span className="text-sm font-bold">Main Portfolio</span>
+      <main
+        className={`flex-1 pb-20 lg:pb-10 min-h-screen transition-all duration-300 ${
+          isSidebarCollapsed ? "lg:ml-16" : "lg:ml-56"
+        }`}
+      >
+        <header className="sticky top-0 z-30 px-8 py-6 flex items-center justify-between bg-background/95 border-b border-border/80 backdrop-blur">
+          <div className="flex items-center gap-3">
+            {isEditingName ? (
+              <input
+                autoFocus
+                value={portfolioName}
+                onChange={(e) => setPortfolioName(e.target.value)}
+                onBlur={() => setIsEditingName(false)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    (e.target as HTMLInputElement).blur();
+                  } else if (e.key === "Escape") {
+                    setPortfolioName("Main Portfolio");
+                    setIsEditingName(false);
+                  }
+                }}
+                className="bg-transparent border-b border-border text-sm md:text-base font-black outline-none px-1 py-0.5"
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsEditingName(true)}
+                className="text-sm md:text-base font-black tracking-tight hover:text-primary transition-colors"
+              >
+                {portfolioName}
+              </button>
+            )}
           </div>
           <div className="flex items-center gap-6">
             <div className="flex bg-muted rounded-xl p-1 border border-border">
@@ -223,7 +381,7 @@ const Dashboard = () => {
             </div>
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-primary text-primary-foreground px-8 py-2.5 rounded-2xl text-sm font-black flex items-center gap-2 transition-all active:scale-95 glow-primary"
+              className="bg-primary text-primary-foreground px-8 py-2.5 rounded-2xl text-sm font-black flex items-center gap-2 transition-all active:scale-95"
             >
               <Plus size={18} /> Add
             </button>
@@ -233,35 +391,67 @@ const Dashboard = () => {
         <div className="p-8 max-w-[1600px] mx-auto space-y-10">
           {activeTab === "dashboard" && (
             <>
-              <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
-                <div className="xl:col-span-2 glass rounded-3xl p-6 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <Zap size={14} className="text-primary" />
-                      <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em]">Net Capital</p>
-                    </div>
-                    <h2 className="text-5xl font-black tracking-tighter tabular-nums">{formatCurrency(stats.totalValue)}</h2>
+              <div className="space-y-6">
+                <div className="flex flex-col gap-4">
+                  <h2 className="text-5xl font-black tracking-tighter tabular-nums">
+                    {formatCurrency(stats.totalValue)}
+                  </h2>
+                  <div
+                    className={`flex items-center gap-2 font-black text-lg ${
+                      stats.delta24h >= 0 ? "text-positive" : "text-negative"
+                    }`}
+                  >
+                    {stats.delta24h >= 0 ? (
+                      <TrendingUp size={24} />
+                    ) : (
+                      <TrendingDown size={24} />
+                    )}
+                    {formatCurrency(Math.abs(stats.delta24h))}
+                    <span className="text-xs opacity-60 ml-1">
+                      ({stats.delta24hPct.toFixed(2)}%)
+                    </span>
                   </div>
-                  <div className="flex flex-col gap-4 mt-8">
-                    <div className={`flex items-center gap-2 font-black text-lg ${stats.delta24h >= 0 ? "text-positive" : "text-negative"}`}>
-                      {stats.delta24h >= 0 ? <TrendingUp size={24} /> : <TrendingDown size={24} />}
-                      {formatCurrency(Math.abs(stats.delta24h))}
-                      <span className="text-xs opacity-60 ml-1">({stats.delta24hPct.toFixed(2)}%)</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <span className="px-3 py-1 bg-muted rounded-lg text-[10px] font-bold text-muted-foreground uppercase tracking-widest">24H</span>
-                      <span className="px-3 py-1 bg-primary/10 rounded-lg text-[10px] font-bold text-primary uppercase tracking-widest animate-pulse">Live</span>
-                    </div>
+                  <div className="flex gap-2">
+                    <span className="px-3 py-1 bg-muted rounded-lg text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                      24H
+                    </span>
+                    <span className="px-3 py-1 bg-primary/10 rounded-lg text-[10px] font-bold text-primary uppercase tracking-widest animate-pulse">
+                      Live
+                    </span>
                   </div>
                 </div>
-                <div className="xl:col-span-3 rounded-3xl overflow-hidden border border-border bg-card">
-                  <TradingViewWidget symbol={selectedCoin} />
+                <div className="relative rounded-3xl">
+                  {/* Chart search + selected asset label */}
+                  <div className="mb-3 flex flex-col items-center gap-2">
+                    <input
+                      value={chartSearch}
+                      onChange={(e) => setChartSearch(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          const value = chartSearch.trim();
+                          if (value) {
+                            setSelectedCoin(value.toLowerCase());
+                          }
+                        }
+                      }}
+                      placeholder="XRP, BTC, ETH"
+                      className="w-full max-w-xs bg-background border border-border/70 rounded-full px-4 py-1.5 text-sm text-center font-medium text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60"
+                    />
+                  </div>
+                  <div className="h-[320px] md:h-[420px] lg:h-[460px] w-full">
+                    <TradingViewWidget
+                      symbol={selectedCoin}
+                      className="h-full w-full"
+                    />
+                  </div>
                 </div>
               </div>
 
               {/* Asset list */}
               <div className="space-y-6">
-                <h3 className="text-2xl font-black tracking-tight uppercase">Active Markets</h3>
+                <h3 className="text-2xl md:text-3xl font-black tracking-tight uppercase">
+                  Active Markets
+                </h3>
                 {stats.assets.length === 0 ? (
                   <div className="py-32 text-center border-2 border-dashed border-border rounded-[40px] bg-card/30">
                     <Briefcase size={64} className="mx-auto mb-6 text-muted-foreground/30" />
@@ -269,28 +459,32 @@ const Dashboard = () => {
                     <p className="text-muted-foreground mb-10">Add your first crypto to get started.</p>
                     <button
                       onClick={() => setIsAddModalOpen(true)}
-                      className="bg-primary text-primary-foreground px-12 py-4 rounded-3xl font-black glow-primary"
+                      className="bg-primary text-primary-foreground px-12 py-4 rounded-3xl font-black"
                     >
                       Add crypto
                     </button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-12 px-8 text-[11px] font-black text-muted-foreground uppercase tracking-[0.25em]">
+                    <div className="grid grid-cols-12 px-4 md:px-8 text-[10px] md:text-[11px] font-black text-muted-foreground uppercase tracking-[0.25em]">
                       <div className="col-span-4">Asset</div>
-                      <div className="col-span-2">Price</div>
+                      <div className="col-span-2">
+                        Price ({currency})
+                      </div>
                       <div className="col-span-2 text-center">Amount</div>
-                      <div className="col-span-2 text-right">Value</div>
+                      <div className="col-span-2 text-right">
+                        Value ({currency})
+                      </div>
                       <div className="col-span-2 text-right">24H</div>
                     </div>
                     {stats.assets.map((asset) => (
                       <div
                         key={asset.id}
                         onClick={() => setSelectedCoin(asset.coin_id)}
-                        className={`relative grid grid-cols-12 items-center px-8 py-5 rounded-[30px] border border-border/70 bg-gradient-to-r from-card/90 via-card/70 to-card/60 shadow-[0_18px_45px_rgba(0,0,0,0.65)] transition-all cursor-pointer group ${
+                        className={`relative grid grid-cols-12 items-center px-4 md:px-8 py-4 md:py-5 rounded-[32px] border border-border/70 bg-gradient-to-r from-card/95 via-card/80 to-card/70 transition-all cursor-pointer group ${
                           selectedCoin === asset.coin_id
-                            ? "ring-2 ring-primary/40 border-primary/40 shadow-[0_22px_55px_rgba(0,255,200,0.35)]"
-                            : "hover:border-primary/30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.9)] hover:-translate-y-0.5"
+                            ? "border-primary/50 bg-card/90"
+                            : "hover:border-primary/30 hover:bg-card/90"
                         }`}
                       >
                         <div className="col-span-4 flex items-center gap-5">
@@ -300,7 +494,7 @@ const Dashboard = () => {
                             className="w-12 h-12 rounded-full ring-2 ring-border/70 group-hover:ring-primary/60 transition-all"
                           />
                           <div>
-                            <div className="font-black text-lg tracking-tight group-hover:text-primary transition-colors">
+                            <div className="font-black text-lg md:text-xl tracking-tight group-hover:text-primary transition-colors">
                               {asset.name}
                             </div>
                             <div className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.25em]">
@@ -308,7 +502,7 @@ const Dashboard = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="col-span-2 font-mono text-base font-bold tabular-nums text-secondary-foreground">
+                        <div className="col-span-2 font-mono text-sm md:text-base font-bold tabular-nums text-secondary-foreground">
                           {formatCurrency(asset.current_price)}
                         </div>
                         <div className="col-span-2 flex justify-center">
@@ -341,7 +535,7 @@ const Dashboard = () => {
                             className="bg-background/80 border border-border/80 rounded-2xl px-4 py-2 w-full max-w-[140px] text-sm font-black text-center focus:border-primary outline-none transition-all focus:bg-background"
                           />
                         </div>
-                        <div className="col-span-2 font-black text-xl tabular-nums tracking-tight text-right">
+                        <div className="col-span-2 font-black text-lg md:text-xl tabular-nums tracking-tight text-right">
                           {formatCurrency(asset.currentValue)}
                         </div>
                         <div className="col-span-2 flex justify-end">
@@ -408,6 +602,198 @@ const Dashboard = () => {
             </div>
           )}
 
+          {activeTab === "buys" && (
+            <div className="max-w-5xl space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-3xl font-black tracking-tight">Buys</h3>
+                <button
+                  onClick={() => addTradeEntry("buys")}
+                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-black flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all"
+                >
+                  <Plus size={16} /> New row
+                </button>
+              </div>
+              <div className="w-full overflow-x-auto thin-scroll rounded-3xl border border-border bg-card/40">
+                <table className="min-w-[780px] w-full border-collapse">
+                  <thead>
+                    <tr className="bg-card/70 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                      <th className="px-4 py-3 text-left border-b border-r border-border">Asset</th>
+                      <th className="px-4 py-3 text-left border-b border-r border-border">Date</th>
+                      <th className="px-4 py-3 text-left border-b border-r border-border">Amount</th>
+                      <th className="px-4 py-3 text-left border-b border-r border-border">Price</th>
+                      <th className="px-4 py-3 text-left border-b border-r border-border">Notes</th>
+                      <th className="px-3 py-3 text-right border-b border-border w-10"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {buys.map((row) => (
+                      <tr
+                        key={row.id}
+                        className="border-b border-border/70"
+                      >
+                        <td className="px-4 py-2.5 align-middle border-r border-border/70">
+                          <input
+                            className="w-full bg-transparent text-sm focus:outline-none focus:bg-background focus:border-primary border-b border-transparent pb-0.5"
+                            placeholder=""
+                            value={row.asset}
+                            onChange={(e) =>
+                              updateTradeEntry("buys", row.id, "asset", e.target.value)
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2.5 align-middle border-r border-border/70">
+                          <input
+                            className="w-full bg-transparent text-sm focus:outline-none focus:bg-background focus:border-primary border-b border-transparent pb-0.5"
+                            placeholder=""
+                            value={row.date}
+                            onChange={(e) =>
+                              updateTradeEntry("buys", row.id, "date", e.target.value)
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2.5 align-middle border-r border-border/70">
+                          <input
+                            className="w-full bg-transparent text-sm focus:outline-none focus:bg-background focus:border-primary border-b border-transparent pb-0.5"
+                            placeholder=""
+                            value={row.amount}
+                            onChange={(e) =>
+                              updateTradeEntry("buys", row.id, "amount", e.target.value)
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2.5 align-middle border-r border-border/70">
+                          <input
+                            className="w-full bg-transparent text-sm focus:outline-none focus:bg-background focus:border-primary border-b border-transparent pb-0.5"
+                            placeholder=""
+                            value={row.price}
+                            onChange={(e) =>
+                              updateTradeEntry("buys", row.id, "price", e.target.value)
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2.5 align-middle border-r border-border/70">
+                          <input
+                            className="w-full bg-transparent text-sm focus:outline-none focus:bg-background focus:border-primary border-b border-transparent pb-0.5"
+                            placeholder=""
+                            value={row.note}
+                            onChange={(e) =>
+                              updateTradeEntry("buys", row.id, "note", e.target.value)
+                            }
+                          />
+                        </td>
+                        <td className="px-3 py-2.5 align-middle text-right">
+                          <button
+                            type="button"
+                            onClick={() => removeTradeEntry("buys", row.id)}
+                            className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+                          >
+                            ×
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "sells" && (
+            <div className="max-w-5xl space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-3xl font-black tracking-tight">Sells</h3>
+                <button
+                  onClick={() => addTradeEntry("sells")}
+                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-black flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all"
+                >
+                  <Plus size={16} /> New row
+                </button>
+              </div>
+              <div className="w-full overflow-x-auto thin-scroll rounded-3xl border border-border bg-card/40">
+                <table className="min-w-[780px] w-full border-collapse">
+                  <thead>
+                    <tr className="bg-card/70 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                      <th className="px-4 py-3 text-left border-b border-r border-border">Asset</th>
+                      <th className="px-4 py-3 text-left border-b border-r border-border">Date</th>
+                      <th className="px-4 py-3 text-left border-b border-r border-border">Amount</th>
+                      <th className="px-4 py-3 text-left border-b border-r border-border">Price</th>
+                      <th className="px-4 py-3 text-left border-b border-r border-border">Notes</th>
+                      <th className="px-3 py-3 text-right border-b border-border w-10"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sells.map((row) => (
+                      <tr
+                        key={row.id}
+                        className="border-b border-border/70"
+                      >
+                        <td className="px-4 py-2.5 align-middle border-r border-border/70">
+                          <input
+                            className="w-full bg-transparent text-sm focus:outline-none focus:bg-background focus:border-primary border-b border-transparent pb-0.5"
+                            placeholder=""
+                            value={row.asset}
+                            onChange={(e) =>
+                              updateTradeEntry("sells", row.id, "asset", e.target.value)
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2.5 align-middle border-r border-border/70">
+                          <input
+                            className="w-full bg-transparent text-sm focus:outline-none focus:bg-background focus:border-primary border-b border-transparent pb-0.5"
+                            placeholder=""
+                            value={row.date}
+                            onChange={(e) =>
+                              updateTradeEntry("sells", row.id, "date", e.target.value)
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2.5 align-middle border-r border-border/70">
+                          <input
+                            className="w-full bg-transparent text-sm focus:outline-none focus:bg-background focus:border-primary border-b border-transparent pb-0.5"
+                            placeholder=""
+                            value={row.amount}
+                            onChange={(e) =>
+                              updateTradeEntry("sells", row.id, "amount", e.target.value)
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2.5 align-middle border-r border-border/70">
+                          <input
+                            className="w-full bg-transparent text-sm focus:outline-none focus:bg-background focus:border-primary border-b border-transparent pb-0.5"
+                            placeholder=""
+                            value={row.price}
+                            onChange={(e) =>
+                              updateTradeEntry("sells", row.id, "price", e.target.value)
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-2.5 align-middle border-r border-border/70">
+                          <input
+                            className="w-full bg-transparent text-sm focus:outline-none focus:bg-background focus:border-primary border-b border-transparent pb-0.5"
+                            placeholder=""
+                            value={row.note}
+                            onChange={(e) =>
+                              updateTradeEntry("sells", row.id, "note", e.target.value)
+                            }
+                          />
+                        </td>
+                    <td className="px-3 py-2.5 align-middle text-right">
+                      <button
+                        type="button"
+                        onClick={() => removeTradeEntry("sells", row.id)}
+                        className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        ×
+                      </button>
+                    </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {activeTab === "settings" && (
             <div className="max-w-4xl space-y-10">
               <h3 className="text-4xl font-black tracking-tight">Settings</h3>
@@ -439,7 +825,7 @@ const Dashboard = () => {
                 ) : (
                   <button
                     onClick={handleCheckout}
-                    className="bg-primary text-primary-foreground px-8 py-3 rounded-2xl font-black transition-all hover:opacity-90 active:scale-[0.98] glow-primary flex items-center gap-2"
+                    className="bg-primary text-primary-foreground px-8 py-3 rounded-2xl font-black transition-all hover:opacity-90 active:scale-[0.98] flex items-center gap-2"
                   >
                     Upgrade to Premium <ChevronRight size={18} />
                   </button>
@@ -526,7 +912,7 @@ const Dashboard = () => {
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-background/90 backdrop-blur-lg" onClick={() => setIsAddModalOpen(false)} />
-          <div className="glass w-full max-w-2xl relative z-10 rounded-3xl p-10 border-primary/20">
+          <div className="glass w-full max-w-2xl max-h-[80vh] relative z-10 rounded-3xl p-8 md:p-10 border-primary/20 flex flex-col">
             <div className="flex items-center justify-between mb-10">
               <h3 className="text-3xl font-black tracking-tight uppercase">Search crypto</h3>
               <button onClick={() => setIsAddModalOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors p-2"><X size={32} /></button>
@@ -545,7 +931,7 @@ const Dashboard = () => {
                 </button>
               </div>
             )}
-            <div className="relative mb-10">
+            <div className="relative mb-6">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground" size={24} />
               <input
                 type="text"
@@ -556,7 +942,7 @@ const Dashboard = () => {
                 autoFocus
               />
             </div>
-            <div className="space-y-4 max-h-[500px] overflow-y-auto pr-4">
+            <div className="space-y-4 max-h-[55vh] overflow-y-auto pr-3 thin-scroll">
               {top50.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.symbol.toLowerCase().includes(searchQuery.toLowerCase())).map((coin) => (
                 <button
                   key={coin.id}
@@ -588,7 +974,7 @@ const Dashboard = () => {
         <button onClick={() => setActiveTab("dashboard")} className={`flex flex-col items-center gap-2 ${activeTab === "dashboard" ? "text-primary" : "text-muted-foreground"}`}>
           <Layers size={26} /><span className="text-[10px] font-black uppercase tracking-tighter">Terminal</span>
         </button>
-        <button onClick={() => setIsAddModalOpen(true)} className="w-16 h-16 bg-primary text-primary-foreground rounded-[24px] flex items-center justify-center -mt-12 glow-primary active:scale-90 transition-all ring-8 ring-background">
+        <button onClick={() => setIsAddModalOpen(true)} className="w-16 h-16 bg-primary text-primary-foreground rounded-[24px] flex items-center justify-center -mt-12 active:scale-90 transition-all ring-8 ring-background">
           <Plus size={36} />
         </button>
         <button onClick={() => setActiveTab("assets")} className={`flex flex-col items-center gap-2 ${activeTab === "assets" ? "text-primary" : "text-muted-foreground"}`}>
