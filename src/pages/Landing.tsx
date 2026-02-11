@@ -22,9 +22,9 @@ const Landing = () => {
       <AuthStarsBackground />
 
       <div className="relative z-10">
-        {/* Hero – nav only in hero, scrolls away with it */}
-        <section className="pt-6 pb-20 px-6 text-center">
-        <nav className="w-full max-w-6xl mx-auto flex items-center justify-between mb-16 md:mb-24">
+        {/* Hero – full viewport height so next section doesn’t show */}
+        <section className="min-h-screen flex flex-col pt-6 pb-20 px-6 text-center">
+        <nav className="w-full flex items-center justify-between flex-shrink-0 px-6 md:px-8 lg:px-10">
           <div className="flex items-center gap-3">
             <span className="text-xl font-black tracking-tighter">
               LIVE<span className="text-primary">TRACK</span>
@@ -45,7 +45,7 @@ const Landing = () => {
             </button>
           </div>
         </nav>
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full space-y-8">
           
 
 

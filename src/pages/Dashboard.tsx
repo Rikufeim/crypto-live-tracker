@@ -9,7 +9,7 @@ import TradingViewWidget from "@/components/TradingViewWidget";
 import {
   Activity, Layers, Briefcase, Settings, Plus, Search, X,
   Trash2, AlertTriangle, Zap, TrendingUp, TrendingDown, ChevronLeft,
-  Globe, Shield, Info, ChevronRight, Crown,
+  Globe, Shield, Info, ChevronRight, Crown, ImageIcon,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -46,6 +46,11 @@ const Dashboard = () => {
   const [sells, setSells] = useState<TradeEntry[]>([
     { id: "sell-1", asset: "", date: "", amount: "", price: "", note: "" },
   ]);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [analysisQuestion, setAnalysisQuestion] = useState("");
+  const [analysisResult, setAnalysisResult] = useState<{ summary: string; impactOnCrypto: string } | null>(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
 
   // Persist portfolio name and trade tables per user in browser storage
   useEffect(() => {
@@ -218,6 +223,104 @@ const Dashboard = () => {
     setter((prev) => prev.filter((entry) => entry.id !== id));
   };
 
+  const compressImageForAnalysis = useCallback(
+    (file: File): Promise<string> =>
+      new Promise((resolve, reject) => {
+        const img = document.createElement("img");
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          const maxW = 800;
+          const maxH = 800;
+          let w = img.naturalWidth;
+          let h = img.naturalHeight;
+          if (w > maxW || h > maxH) {
+            const r = Math.min(maxW / w, maxH / h);
+            w = Math.round(w * r);
+            h = Math.round(h * r);
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("Canvas not supported"));
+            return;
+          }
+          ctx.drawImage(img, 0, 0, w, h);
+          try {
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
+            const base64 = dataUrl.includes(",") ? dataUrl.split(",")[1] : dataUrl;
+            resolve(base64);
+          } catch (e) {
+            reject(e);
+          }
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error("Failed to load image"));
+        };
+        img.src = url;
+      }),
+    []
+  );
+
+  const handleImageFile = useCallback(
+    async (file: File) => {
+      if (!file.type.startsWith("image/")) return;
+      try {
+        const base64 = await compressImageForAnalysis(file);
+        const dataUrl = `data:image/jpeg;base64,${base64}`;
+        setImagePreview(dataUrl);
+        setImageBase64(base64);
+        setAnalysisResult(null);
+      } catch {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+          setImagePreview(dataUrl);
+          const base64 = dataUrl.includes(",") ? dataUrl.split(",")[1] : dataUrl;
+          setImageBase64(base64);
+          setAnalysisResult(null);
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    [compressImageForAnalysis]
+  );
+
+  const defaultAnalysisQuestion = `How does this affect ${selectedCoin.toUpperCase()} price?`;
+  const analysisQuestionToSend = analysisQuestion.trim() || defaultAnalysisQuestion;
+
+  const runImageAnalysis = useCallback(async () => {
+    if (!imageBase64 || !selectedCoin) return;
+    setAnalysisLoading(true);
+    setAnalysisResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("analyze-image", {
+        body: {
+          imageBase64,
+          crypto: selectedCoin,
+          question: analysisQuestionToSend,
+        },
+      });
+      if (error) throw new Error(error.message || "Edge function request failed.");
+      if (data?.error) throw new Error(typeof data.error === "string" ? data.error : data.error?.message ?? "Analysis failed.");
+      setAnalysisResult({
+        summary: data?.summary ?? "",
+        impactOnCrypto: data?.impactOnCrypto ?? "",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Analysis failed",
+        description: err?.message ?? "Could not analyze image. Deploy the 'analyze-image' function and set OPENAI_API_KEY in Supabase.",
+        variant: "destructive",
+      });
+    } finally {
+      setAnalysisLoading(false);
+    }
+  }, [imageBase64, selectedCoin, analysisQuestionToSend, toast]);
+
   const handleAdd = async (coin: any) => {
     if (!isPremium && holdings.length >= FREE_HOLDING_LIMIT) {
       toast({
@@ -288,6 +391,7 @@ const Dashboard = () => {
             { id: "assets", icon: Briefcase, label: "Portfolio" },
             { id: "buys", icon: TrendingUp, label: "Buys" },
             { id: "sells", icon: TrendingDown, label: "Sells" },
+            { id: "image-analysis", icon: ImageIcon, label: "Image analysis" },
             { id: "settings", icon: Settings, label: "Settings" },
           ].map((item) => (
             <button
@@ -599,6 +703,84 @@ const Dashboard = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {activeTab === "image-analysis" && (
+            <div className="max-w-3xl space-y-6">
+              <h3 className="text-3xl font-black tracking-tight">Image analysis</h3>
+              <p className="text-muted-foreground">
+                Drop a screenshot of news, a tweet, or an article. We’ll summarize it and explain how it might affect your selected crypto.
+              </p>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Selected crypto:</span>
+                <span className="font-black uppercase tracking-wide text-primary">{selectedCoin}</span>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block">
+                  Your question (optional)
+                </label>
+                <input
+                  type="text"
+                  value={analysisQuestion}
+                  onChange={(e) => setAnalysisQuestion(e.target.value)}
+                  placeholder={`e.g. How does this affect ${selectedCoin.toUpperCase()} price?`}
+                  className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+                />
+              </div>
+              <div
+                onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-primary/50", "bg-card/80"); }}
+                onDragLeave={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-primary/50", "bg-card/80"); }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.classList.remove("border-primary/50", "bg-card/80");
+                  const file = e.dataTransfer.files[0];
+                  if (file) handleImageFile(file);
+                }}
+                className="border-2 border-dashed border-border rounded-3xl p-8 md:p-12 text-center transition-colors bg-card/30"
+              >
+                {imagePreview ? (
+                  <div className="space-y-4">
+                    <img src={imagePreview} alt="Dropped" className="max-h-48 mx-auto rounded-2xl object-contain border border-border" />
+                    <div className="flex flex-wrap gap-3 justify-center">
+                      <button
+                        type="button"
+                        onClick={runImageAnalysis}
+                        disabled={analysisLoading}
+                        className="px-6 py-3 rounded-2xl bg-primary text-white font-black text-sm disabled:opacity-50"
+                      >
+                        {analysisLoading ? "Analyzing…" : "Get analysis"}
+                      </button>
+                      <label className="px-6 py-3 rounded-2xl border border-border font-bold text-sm cursor-pointer hover:bg-card/50">
+                        Change image
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageFile(f); e.target.value = ""; }} />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => { setImagePreview(null); setImageBase64(null); setAnalysisResult(null); }}
+                        className="px-6 py-3 rounded-2xl text-muted-foreground hover:text-foreground text-sm font-bold"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <label className="cursor-pointer block">
+                    <ImageIcon className="mx-auto mb-4 text-muted-foreground" size={48} />
+                    <p className="font-bold text-foreground mb-1">Drop an image here or click to upload</p>
+                    <p className="text-sm text-muted-foreground">News, tweet, or article screenshot</p>
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageFile(f); e.target.value = ""; }} />
+                  </label>
+                )}
+              </div>
+              {analysisResult && (
+                <div className="space-y-4 rounded-3xl border border-border bg-card/40 p-6">
+                  <h4 className="text-sm font-black uppercase tracking-widest text-muted-foreground">Summary</h4>
+                  <p className="text-foreground">{analysisResult.summary}</p>
+                  <h4 className="text-sm font-black uppercase tracking-widest text-primary mt-6">Impact on {selectedCoin.toUpperCase()}</h4>
+                  <p className="text-foreground">{analysisResult.impactOnCrypto}</p>
+                </div>
+              )}
             </div>
           )}
 
