@@ -27,7 +27,7 @@ const Landing = () => {
         <section className="min-h-screen flex flex-col pt-6 pb-20 px-6 text-center">
         <nav className="w-full flex items-center justify-between flex-shrink-0 px-6 md:px-8 lg:px-10">
           <div className="flex items-center gap-3">
-            <img src={logoImg} alt="LiveTrack" className="h-10 md:h-14" />
+            <img src={logoImg} alt="LiveTrack" className="h-16 md:h-20" />
           </div>
           <div className="flex items-center gap-3">
             <button
