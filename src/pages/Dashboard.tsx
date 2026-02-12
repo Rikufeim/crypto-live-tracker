@@ -376,7 +376,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between h-14 px-4 md:px-6">
           {/* Left: Logo + Nav links */}
           <div className="flex items-center gap-6">
-            <img src={logoImg} alt="LiveTrack" className="h-7 flex-shrink-0" />
+            <img src={logoImg} alt="LiveTrack" className="h-10 md:h-12 flex-shrink-0" />
 
             {/* Desktop nav links */}
             <div className="hidden md:flex items-center gap-1">
@@ -524,7 +524,7 @@ const Dashboard = () => {
           </div>
         </header>
 
-        <div className={(activeTab === "dashboard" || activeTab === "multitracker") ? "flex-1 flex flex-col overflow-hidden relative z-0" : "p-8 max-w-[1600px] mx-auto space-y-10 relative z-0"}>
+        <div className={(activeTab === "dashboard" || activeTab === "multitracker") ? "flex-1 flex flex-col overflow-hidden relative z-0" : "p-4 md:p-8 w-full space-y-10 relative z-0"}>
           {activeTab === "dashboard" && (
             <TradingDashboard
               stats={stats}
@@ -544,7 +544,7 @@ const Dashboard = () => {
           )}
 
           {activeTab === "assets" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 w-full">
               {stats.assets.map((asset) => (
                 <div key={asset.id} className="glass rounded-3xl p-6 relative group hover:border-primary/30 transition-all cursor-pointer" onClick={() => setSelectedCoin(asset.coin_id)}>
                   <div className="flex justify-between items-start mb-8">
@@ -975,7 +975,7 @@ const Dashboard = () => {
           )}
 
           {activeTab === "settings" && (
-            <div className="max-w-4xl space-y-10">
+            <div className="w-full space-y-10">
               <h3 className="text-4xl font-black tracking-tight">Settings</h3>
 
               {/* Premium upgrade / manage */}
@@ -1168,15 +1168,21 @@ const Dashboard = () => {
       }
 
       {/* Mobile nav */}
-      <nav className="fixed bottom-0 left-0 right-0 lg:hidden glass px-10 py-5 flex items-center justify-around z-40">
-        <button onClick={() => setActiveTab("dashboard")} className={`flex flex-col items-center gap-2 ${activeTab === "dashboard" ? "text-primary" : "text-muted-foreground"}`}>
-          <Layers size={26} /><span className="text-[10px] font-black uppercase tracking-tighter">Terminal</span>
+      <nav className="fixed bottom-0 left-0 right-0 lg:hidden glass px-4 py-3 flex items-center justify-around z-40 safe-area-bottom">
+        <button onClick={() => setActiveTab("dashboard")} className={`flex flex-col items-center gap-1 ${activeTab === "dashboard" ? "text-primary" : "text-muted-foreground"}`}>
+          <Layers size={22} /><span className="text-[9px] font-black uppercase tracking-tighter">Terminal</span>
         </button>
-        <button onClick={() => setIsAddModalOpen(true)} className="w-16 h-16 bg-primary text-primary-foreground rounded-[24px] flex items-center justify-center -mt-12 active:scale-90 transition-all ring-8 ring-background">
-          <Plus size={36} />
+        <button onClick={() => setActiveTab("assets")} className={`flex flex-col items-center gap-1 ${activeTab === "assets" ? "text-primary" : "text-muted-foreground"}`}>
+          <Briefcase size={22} /><span className="text-[9px] font-black uppercase tracking-tighter">Assets</span>
         </button>
-        <button onClick={() => setActiveTab("assets")} className={`flex flex-col items-center gap-2 ${activeTab === "assets" ? "text-primary" : "text-muted-foreground"}`}>
-          <Briefcase size={26} /><span className="text-[10px] font-black uppercase tracking-tighter">Assets</span>
+        <button onClick={() => setIsAddModalOpen(true)} className="w-14 h-14 bg-primary text-primary-foreground rounded-[20px] flex items-center justify-center -mt-8 active:scale-90 transition-all ring-4 ring-background shadow-lg">
+          <Plus size={28} />
+        </button>
+        <button onClick={() => setActiveTab("settings")} className={`flex flex-col items-center gap-1 ${activeTab === "settings" ? "text-primary" : "text-muted-foreground"}`}>
+          <Settings size={22} /><span className="text-[9px] font-black uppercase tracking-tighter">Settings</span>
+        </button>
+        <button onClick={() => setActiveTab("multitracker")} className={`flex flex-col items-center gap-1 ${activeTab === "multitracker" ? "text-primary" : "text-muted-foreground"}`}>
+          <LayoutGrid size={22} /><span className="text-[9px] font-black uppercase tracking-tighter">Tracker</span>
         </button>
       </nav>
     </div >
