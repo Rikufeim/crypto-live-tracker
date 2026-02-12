@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Activity, Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AuthStarsBackground } from "@/components/ui/auth-stars-background";
-import logoImg from "@/assets/logo.png";
+import { Logo } from "@/components/Logo";
 
 const Auth = () => {
   const { user } = useAuth();
@@ -72,7 +72,7 @@ const Auth = () => {
           </button>
         </div>
         <div className="flex-1 flex justify-center">
-          <img src={logoImg} alt="LiveTrack" className="h-10 md:h-12" />
+          <Logo className="text-3xl md:text-4xl" />
         </div>
         <div className="flex-1 flex justify-end" />
       </div>
