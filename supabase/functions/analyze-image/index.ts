@@ -59,13 +59,43 @@ serve(async (req) => {
 
     const userQuestion =
       question?.trim() ||
-      `Summarize what this image shows (news, tweet, or article) and explain how it could affect ${crypto.toUpperCase()} price and sentiment.`;
+      `Analyze this image comprehensively. If it's a chart, identify trends, patterns, support/resistance levels, and predict likely price direction. If it's news or a tweet, explain the market sentiment and how it could affect ${crypto.toUpperCase()} price.`;
 
-    const systemPrompt = `You are a crypto analyst. You must analyze the image accurately and in detail.
+    const systemPrompt = `You are an expert crypto analyst with deep knowledge of technical analysis, market sentiment, and cryptocurrency markets. Analyze the provided image in comprehensive detail.
 
-RULES:
-1. SUMMARY: Describe exactly what you see in the image. Include: all visible text (quotes, headlines, tweets, names, handles, numbers), the source (e.g. Twitter/X, news site), who is speaking or featured, and any charts or data shown. Be precise—do not invent or generalize.
-2. IMPACT ON CRYPTO: Answer the user's question about "${crypto.toUpperCase()}" using only what is actually in the image. Tie your answer to specific content from the image (e.g. "The tweet from X says ... which could ..."). If the image does not mention ${crypto.toUpperCase()}, say so and explain how the visible content might still relate to it. Be factual and neutral.
+ANALYSIS FRAMEWORK:
+
+**If the image contains a CHART:**
+1. Identify the timeframe and price action (trend: bullish/bearish/sideways)
+2. Recognize chart patterns (triangles, head & shoulders, flags, channels, etc.)
+3. Identify key support and resistance levels visible in the chart
+4. Note any technical indicators shown (RSI, MACD, volume, moving averages, etc.)
+5. Predict the likely next price direction based on the technical setup
+6. Assess the strength of the current trend and potential reversal points
+
+**If the image contains NEWS, TWEETS, or TEXT:**
+1. Extract and quote the key headlines, claims, or statements verbatim
+2. Identify the source (Twitter/X user, news outlet, influencer, official announcement, etc.)
+3. Determine the sentiment (extremely bullish, bullish, neutral, bearish, extremely bearish)
+4. Assess credibility and potential market impact of the source
+5. Identify specific catalysts or triggers mentioned (regulations, partnerships, technology updates, market events)
+
+**RESPONSE STRUCTURE:**
+- **summary**: A detailed description of what you observe in the image. For charts: describe the pattern, trend, and key levels. For news/tweets: quote the important text and identify the source.
+- **impactOnCrypto**: Your analysis of how this specifically affects ${crypto.toUpperCase()}. Include:
+  • Direct impact if ${crypto.toUpperCase()} is mentioned
+  • Indirect/correlated impact if it's about related assets or market trends
+  • Likely price direction (up/down/neutral) with confidence level
+  • Timeframe consideration (short-term vs long-term impact)
+  • Risk factors or caveats
+
+IMPORTANT RULES:
+- Base your analysis ONLY on what is actually visible in the image
+- If ${crypto.toUpperCase()} is not directly mentioned, explain the potential correlation
+- For charts: Always provide a directional prediction (bullish/bearish/neutral) with reasoning
+- For news/tweets: Always quote key text from the image
+- Be specific, factual, and avoid vague generalizations
+- Use technical analysis terminology accurately
 
 Respond with valid JSON only, no markdown or code fences. Use exactly these two keys: "summary" (string) and "impactOnCrypto" (string).`;
 
@@ -77,13 +107,14 @@ Respond with valid JSON only, no markdown or code fences. Use exactly these two 
       },
       body: JSON.stringify({
         model: "gpt-4o",
-        max_tokens: 800,
+        max_tokens: 1200,
+        temperature: 0.7,
         messages: [
           { role: "system", content: systemPrompt },
           {
             role: "user",
             content: [
-              { type: "text", text: `User question: ${userQuestion}\n\nFirst look at the image carefully and extract all text and details. Then write summary (what the image actually shows) and impactOnCrypto (answer to the question based only on the image). Respond with JSON only: {"summary": "...", "impactOnCrypto": "..."}` },
+              { type: "text", text: `User's specific question: "${userQuestion}"\n\nAnalyze the image carefully. Look for all text, chart patterns, trends, levels, and indicators. Provide a comprehensive analysis in JSON format: {"summary": "detailed description of what you see", "impactOnCrypto": "comprehensive analysis of impact on ${crypto.toUpperCase()} with directional prediction"}` },
               { type: "image_url", image_url: { url: imageUrl } },
             ],
           },

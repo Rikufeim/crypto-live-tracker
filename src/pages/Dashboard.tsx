@@ -6,10 +6,14 @@ import { useMarketData, useTop50 } from "@/hooks/useMarketData";
 import { supabase } from "@/integrations/supabase/client";
 import { FREE_HOLDING_LIMIT, STRIPE_CONFIG } from "@/lib/constants";
 import TradingViewWidget from "@/components/TradingViewWidget";
+import { Calendar } from "@/components/Calendar";
+import { MiniChart } from "@/components/MiniChart";
+import { TradingDashboard } from "@/components/TradingDashboard";
+import { MultiTracker } from "@/components/MultiTracker";
 import {
   Activity, Layers, Briefcase, Settings, Plus, Search, X,
   Trash2, AlertTriangle, Zap, TrendingUp, TrendingDown, ChevronLeft,
-  Globe, Shield, Info, ChevronRight, Crown, ImageIcon,
+  Globe, Shield, Info, ChevronRight, Crown, ImageIcon, LayoutGrid, Menu, LogOut,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -39,6 +43,7 @@ const Dashboard = () => {
   const [portfolioName, setPortfolioName] = useState("Main Portfolio");
   const [isEditingName, setIsEditingName] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chartSearch, setChartSearch] = useState("xrp");
   const [buys, setBuys] = useState<TradeEntry[]>([
     { id: "buy-1", asset: "", date: "", amount: "", price: "", note: "" },
@@ -363,302 +368,180 @@ const Dashboard = () => {
   if (!user) { navigate("/auth"); return null; }
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden flex">
-      {/* Sidebar */}
-      <aside
-        className={`fixed left-0 top-0 bottom-0 bg-sidebar border-r border-sidebar-border hidden lg:flex flex-col z-40 transition-all duration-300 ${
-          isSidebarCollapsed ? "w-16 p-3" : "w-56 p-6"
-        }`}
-      >
-        <div
-          className={`flex items-center mb-14 ${
-            isSidebarCollapsed ? "justify-center" : "justify-start"
-          }`}
-        >
-          {!isSidebarCollapsed ? (
-            <span className="text-2xl font-black tracking-tighter">
-              LIVE<span className="text-primary">TRACK</span>
+    <div className="min-h-screen bg-black text-foreground font-sans overflow-x-hidden flex flex-col selection:bg-[#00E5A8]/20 relative">
+
+      {/* ═══ TOP NAVIGATION BAR ═══ */}
+      <nav className="sticky top-0 z-50 w-full border-b border-white/5 bg-black/80 backdrop-blur-md">
+        <div className="flex items-center justify-between h-14 px-4 md:px-6">
+          {/* Left: Logo + Nav links */}
+          <div className="flex items-center gap-6">
+            <span className="text-lg font-black tracking-tight flex-shrink-0">
+              LIVE<span className="text-[#2DD4A0]">TRACK</span>
             </span>
-          ) : (
-            <span className="text-xl font-black tracking-tighter">
-              L<span className="text-primary">T</span>
-            </span>
-          )}
-        </div>
-        <nav className="space-y-2 flex-1">
-          {[
-            { id: "dashboard", icon: Layers, label: "Dashboard" },
-            { id: "assets", icon: Briefcase, label: "Portfolio" },
-            { id: "buys", icon: TrendingUp, label: "Buys" },
-            { id: "sells", icon: TrendingDown, label: "Sells" },
-            { id: "image-analysis", icon: ImageIcon, label: "Image analysis" },
-            { id: "settings", icon: Settings, label: "Settings" },
-          ].map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 py-3 rounded-xl transition-all ${
-                isSidebarCollapsed ? "justify-center" : "justify-start px-4"
-              } ${
-                activeTab === item.id
-                  ? "text-primary"
-                  : "text-sidebar-foreground hover:text-foreground"
-              }`}
-            >
-              <item.icon size={22} />
-              {!isSidebarCollapsed && (
-                <span className="font-bold">{item.label}</span>
-              )}
-            </button>
-          ))}
-        </nav>
-        <div className="pt-8 border-t border-sidebar-border space-y-4">
-          <button
-            type="button"
-            onClick={() => setIsSidebarCollapsed((v) => !v)}
-            className="w-8 h-8 rounded-full border border-sidebar-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
-          >
-            {isSidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-          </button>
-          {!isSidebarCollapsed && (
-            <>
-              {isPremium && (
-                <div className="flex items-center gap-2 text-primary">
-                  <Crown size={14} />
-                  <span className="text-[10px] font-black uppercase tracking-widest">
-                    Premium
-                  </span>
-                </div>
-              )}
+
+            {/* Desktop nav links */}
+            <div className="hidden md:flex items-center gap-1">
+              {[
+                { id: "dashboard", icon: Layers, label: "Dashboard" },
+                { id: "multitracker", icon: LayoutGrid, label: "Multi Tracker" },
+                { id: "assets", icon: Briefcase, label: "Portfolio" },
+                { id: "buys", icon: TrendingUp, label: "Buys" },
+                { id: "sells", icon: TrendingDown, label: "Sells" },
+                { id: "settings", icon: Settings, label: "Settings" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === item.id
+                    ? 'text-[#00E5A8] bg-[#00E5A8]/10'
+                    : 'text-[#6B7280] hover:text-white hover:bg-white/5'
+                    }`}
+                >
+                  <item.icon size={14} />
+                  <span className="hidden lg:inline">{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: Actions */}
+          <div className="flex items-center gap-3">
+            {!isPremium && (
+              <button
+                onClick={handleCheckout}
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border border-[#374151] bg-gradient-to-b from-[#2a2e3e] to-[#0f1219] text-[#E5E7EB] hover:brightness-110 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] transition-all"
+              >
+                <Crown size={12} className="text-[#00E5A8]" />
+                Upgrade
+              </button>
+            )}
+
+            {/* User avatar */}
+            <div className="hidden md:flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-[#1E2130] flex items-center justify-center text-[10px] font-bold text-[#6B7280]">
+                {user?.email?.[0]?.toUpperCase() || 'U'}
+              </div>
               <button
                 onClick={signOut}
-                className="text-xs font-black uppercase text-muted-foreground hover:text-destructive transition-colors text-left"
+                className="text-[#6B7280] hover:text-[#EF4444] transition-colors"
+                title="Sign Out"
               >
-                Sign out
+                <LogOut size={14} />
               </button>
-            </>
-          )}
+            </div>
+
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5 text-[#9CA3AF]"
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
-      </aside>
+      </nav>
+
+      {/* ═══ MOBILE MENU OVERLAY ═══ */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex flex-col pt-16 px-6 md:hidden">
+          <nav className="space-y-2 flex-1">
+            {[
+              { id: "dashboard", icon: Layers, label: "Dashboard" },
+              { id: "multitracker", icon: LayoutGrid, label: "Multi Tracker" },
+              { id: "assets", icon: Briefcase, label: "Portfolio" },
+              { id: "buys", icon: TrendingUp, label: "Buys" },
+              { id: "sells", icon: TrendingDown, label: "Sells" },
+              { id: "settings", icon: Settings, label: "Settings" },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl text-sm font-bold transition-all ${activeTab === item.id
+                  ? 'text-[#00E5A8] bg-[#00E5A8]/10'
+                  : 'text-[#9CA3AF] hover:text-white hover:bg-white/5'
+                  }`}
+              >
+                <item.icon size={20} />
+                {item.label}
+              </button>
+            ))}
+          </nav>
+
+          {/* Mobile bottom section */}
+          <div className="border-t border-white/5 py-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-[#1E2130] flex items-center justify-center text-sm font-bold text-[#6B7280]">
+                {user?.email?.[0]?.toUpperCase() || 'U'}
+              </div>
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-white truncate">
+                  {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
+                </div>
+                <div className="text-[10px] text-[#6B7280] truncate">{user?.email || ''}</div>
+              </div>
+            </div>
+            {!isPremium && (
+              <button
+                onClick={() => { handleCheckout(); setMobileMenuOpen(false); }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-[#374151] bg-gradient-to-b from-[#2a2e3e] to-[#0f1219] text-xs font-bold uppercase tracking-wider text-[#E5E7EB] hover:brightness-110 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] transition-all"
+              >
+                <Crown size={14} className="text-[#00E5A8]" />
+                Upgrade Pro
+              </button>
+            )}
+            <button
+              onClick={() => { signOut(); setMobileMenuOpen(false); }}
+              className="w-full text-left text-[11px] font-bold uppercase tracking-widest text-[#6B7280] hover:text-[#EF4444] transition-colors px-1"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main */}
       <main
-        className={`flex-1 pb-20 lg:pb-10 min-h-screen transition-all duration-300 ${
-          isSidebarCollapsed ? "lg:ml-16" : "lg:ml-56"
-        }`}
+        className={`flex-1 flex flex-col ${(activeTab === 'dashboard' || activeTab === 'multitracker') ? 'h-[calc(100vh-56px)] overflow-hidden' : 'pb-20 lg:pb-10 min-h-[calc(100vh-56px)] bg-transparent'}`}
       >
-        <header className="sticky top-0 z-30 px-8 py-6 flex items-center justify-between bg-background/95 border-b border-border/80 backdrop-blur">
-          <div className="flex items-center gap-3">
-            {isEditingName ? (
-              <input
-                autoFocus
-                value={portfolioName}
-                onChange={(e) => setPortfolioName(e.target.value)}
-                onBlur={() => setIsEditingName(false)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    (e.target as HTMLInputElement).blur();
-                  } else if (e.key === "Escape") {
-                    setPortfolioName("Main Portfolio");
-                    setIsEditingName(false);
-                  }
-                }}
-                className="bg-transparent border-b border-border text-sm md:text-base font-black outline-none px-1 py-0.5"
-              />
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsEditingName(true)}
-                className="text-sm md:text-base font-black tracking-tight hover:text-primary transition-colors"
-              >
-                {portfolioName}
-              </button>
-            )}
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="flex bg-muted rounded-xl p-1 border border-border">
+        <header className={`sticky top-0 z-[60] px-8 py-6 flex items-center justify-end bg-background/0 pointer-events-none ${(activeTab === "multitracker") ? "hidden" : ""}`}>
+          <div className="flex items-center gap-4 pointer-events-auto">
+            <div className="flex bg-[#09090b]/80 backdrop-blur-xl rounded-xl p-1 border border-white/10">
               {["USD", "EUR"].map((f) => (
-                <button key={f} onClick={() => setCurrency(f)} className={`px-4 py-1.5 rounded-lg text-xs font-black transition-all ${currency === f ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                <button
+                  key={f}
+                  onClick={() => setCurrency(f)}
+                  className={`px-5 py-2 rounded-lg text-[10px] font-black tracking-wider transition-all duration-300 ${currency === f ? "bg-[#00E5A8]/20 text-[#00E5A8]" : "text-white/40 hover:text-white"}`}
+                >
                   {f}
                 </button>
               ))}
             </div>
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-primary text-primary-foreground px-8 py-2.5 rounded-2xl text-sm font-black flex items-center gap-2 transition-all active:scale-95"
+              className="bg-[#00E5A8]/20 text-[#00E5A8] px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all hover:bg-[#00E5A8]/30 active:scale-95 border border-[#00E5A8]/20 hover:border-[#00E5A8]/40"
             >
-              <Plus size={18} /> Add
+              <Plus size={16} strokeWidth={3} /> Add
             </button>
           </div>
         </header>
 
-        <div className="p-8 max-w-[1600px] mx-auto space-y-10">
+        <div className={(activeTab === "dashboard" || activeTab === "multitracker") ? "flex-1 flex flex-col overflow-hidden relative z-0" : "p-8 max-w-[1600px] mx-auto space-y-10 relative z-0"}>
           {activeTab === "dashboard" && (
-            <>
-              <div className="space-y-6">
-                <div className="flex flex-col gap-4">
-                  <h2 className="text-5xl font-black tracking-tighter tabular-nums">
-                    {formatCurrency(stats.totalValue)}
-                  </h2>
-                  <div
-                    className={`flex items-center gap-2 font-black text-lg ${
-                      stats.delta24h >= 0 ? "text-positive" : "text-negative"
-                    }`}
-                  >
-                    {stats.delta24h >= 0 ? (
-                      <TrendingUp size={24} />
-                    ) : (
-                      <TrendingDown size={24} />
-                    )}
-                    {formatCurrency(Math.abs(stats.delta24h))}
-                    <span className="text-xs opacity-60 ml-1">
-                      ({stats.delta24hPct.toFixed(2)}%)
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="px-3 py-1 bg-muted rounded-lg text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                      24H
-                    </span>
-                    <span className="px-3 py-1 bg-primary/10 rounded-lg text-[10px] font-bold text-primary uppercase tracking-widest animate-pulse">
-                      Live
-                    </span>
-                  </div>
-                </div>
-                <div className="relative rounded-3xl">
-                  {/* Chart search + selected asset label */}
-                  <div className="mb-3 flex flex-col items-center gap-2">
-                    <input
-                      value={chartSearch}
-                      onChange={(e) => setChartSearch(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          const value = chartSearch.trim();
-                          if (value) {
-                            setSelectedCoin(value.toLowerCase());
-                          }
-                        }
-                      }}
-                      placeholder="XRP, BTC, ETH"
-                      className="w-full max-w-xs bg-background border border-border/70 rounded-full px-4 py-1.5 text-sm text-center font-medium text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60"
-                    />
-                  </div>
-                  <div className="h-[320px] md:h-[420px] lg:h-[460px] w-full">
-                    <TradingViewWidget
-                      symbol={selectedCoin}
-                      className="h-full w-full"
-                    />
-                  </div>
-                </div>
-              </div>
+            <TradingDashboard
+              stats={stats}
+              selectedCoin={selectedCoin}
+              setSelectedCoin={setSelectedCoin}
+              setIsAddModalOpen={setIsAddModalOpen}
+              formatCurrency={formatCurrency}
+              currency={currency}
+              amountInputs={amountInputs}
+              setAmountInputs={setAmountInputs}
+              updateAmount={updateAmount}
+            />
+          )}
 
-              {/* Asset list */}
-              <div className="space-y-6">
-                <h3 className="text-2xl md:text-3xl font-black tracking-tight uppercase">
-                  Active Markets
-                </h3>
-                {stats.assets.length === 0 ? (
-                  <div className="py-32 text-center border-2 border-dashed border-border rounded-[40px] bg-card/30">
-                    <Briefcase size={64} className="mx-auto mb-6 text-muted-foreground/30" />
-                    <h4 className="text-2xl font-black mb-2 uppercase">Empty Terminal</h4>
-                    <p className="text-muted-foreground mb-10">Add your first crypto to get started.</p>
-                    <button
-                      onClick={() => setIsAddModalOpen(true)}
-                      className="bg-primary text-primary-foreground px-12 py-4 rounded-3xl font-black"
-                    >
-                      Add crypto
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-12 px-4 md:px-8 text-[10px] md:text-[11px] font-black text-muted-foreground uppercase tracking-[0.25em]">
-                      <div className="col-span-4">Asset</div>
-                      <div className="col-span-2">
-                        Price ({currency})
-                      </div>
-                      <div className="col-span-2 text-center">Amount</div>
-                      <div className="col-span-2 text-right">
-                        Value ({currency})
-                      </div>
-                      <div className="col-span-2 text-right">24H</div>
-                    </div>
-                    {stats.assets.map((asset) => (
-                      <div
-                        key={asset.id}
-                        onClick={() => setSelectedCoin(asset.coin_id)}
-                        className={`relative grid grid-cols-12 items-center px-4 md:px-8 py-4 md:py-5 rounded-[32px] border border-border/70 bg-gradient-to-r from-card/95 via-card/80 to-card/70 transition-all cursor-pointer group ${
-                          selectedCoin === asset.coin_id
-                            ? "border-primary/50 bg-card/90"
-                            : "hover:border-primary/30 hover:bg-card/90"
-                        }`}
-                      >
-                        <div className="col-span-4 flex items-center gap-5">
-                          <img
-                            src={asset.image}
-                            alt=""
-                            className="w-12 h-12 rounded-full ring-2 ring-border/70 group-hover:ring-primary/60 transition-all"
-                          />
-                          <div>
-                            <div className="font-black text-lg md:text-xl tracking-tight group-hover:text-primary transition-colors">
-                              {asset.name}
-                            </div>
-                            <div className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.25em]">
-                              {asset.symbol} • #{asset.market_cap_rank}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="col-span-2 font-mono text-sm md:text-base font-bold tabular-nums text-secondary-foreground">
-                          {formatCurrency(asset.current_price)}
-                        </div>
-                        <div className="col-span-2 flex justify-center">
-                          <input
-                            type="text"
-                            value={
-                              amountInputs[asset.id] ??
-                              (asset.amount || asset.amount === 0
-                                ? asset.amount.toString()
-                                : "")
-                            }
-                            onClick={(e) => e.stopPropagation()}
-                            onChange={(e) => {
-                              const normalizedValue = e.target.value.replace(",", ".");
-                              setAmountInputs((prev) => ({
-                                ...prev,
-                                [asset.id]: normalizedValue,
-                              }));
-                            }}
-                            onBlur={(e) => {
-                              const normalizedValue = e.target.value.replace(",", ".");
-                              const parsed = parseFloat(normalizedValue);
-                              const safeValue = Number.isFinite(parsed) ? parsed : 0;
-                              updateAmount(asset.id, safeValue);
-                              setAmountInputs((prev) => ({
-                                ...prev,
-                                [asset.id]: normalizedValue,
-                              }));
-                            }}
-                            className="bg-background/80 border border-border/80 rounded-2xl px-4 py-2 w-full max-w-[140px] text-sm font-black text-center focus:border-primary outline-none transition-all focus:bg-background"
-                          />
-                        </div>
-                        <div className="col-span-2 font-black text-lg md:text-xl tabular-nums tracking-tight text-right">
-                          {formatCurrency(asset.currentValue)}
-                        </div>
-                        <div className="col-span-2 flex justify-end">
-                          <span
-                            className={`px-3 py-1.5 rounded-full text-[10px] font-black border uppercase tracking-[0.2em] ${
-                              (asset.price_change_percentage_24h ?? 0) >= 0
-                                ? "bg-positive/10 text-positive border-positive/20"
-                                : "bg-negative/10 text-negative border-negative/20"
-                            }`}
-                          >
-                            {asset.price_change_percentage_24h?.toFixed(2)}%
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </>
+          {activeTab === "multitracker" && (
+            <MultiTracker />
           )}
 
           {activeTab === "assets" && (
@@ -707,78 +590,194 @@ const Dashboard = () => {
           )}
 
           {activeTab === "image-analysis" && (
-            <div className="max-w-3xl space-y-6">
-              <h3 className="text-3xl font-black tracking-tight">Image analysis</h3>
-              <p className="text-muted-foreground">
-                Drop a screenshot of news, a tweet, or an article. We’ll summarize it and explain how it might affect your selected crypto.
-              </p>
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-muted-foreground">Selected crypto:</span>
-                <span className="font-black uppercase tracking-wide text-primary">{selectedCoin}</span>
+            <div className="max-w-4xl space-y-8">
+              {/* Header */}
+              <div className="space-y-3">
+                <h3 className="text-4xl md:text-5xl font-black tracking-tight">AI Image Analysis</h3>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                  Upload charts, news screenshots, tweets, or market analysis. Our AI will analyze the content and provide comprehensive insights on how it affects your selected cryptocurrency.
+                </p>
               </div>
-              <div className="space-y-2">
+
+              {/* Crypto Selector - Prominent */}
+              <div className="glass rounded-3xl p-6 border-primary/20">
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block mb-3">
+                  Select cryptocurrency to analyze
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    list="crypto-suggestions"
+                    value={chartSearch}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setChartSearch(value);
+                      setSelectedCoin(value.toLowerCase());
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        const value = chartSearch.trim();
+                        if (value) {
+                          setSelectedCoin(value.toLowerCase());
+                        }
+                      }
+                    }}
+                    placeholder="Type: BTC, ETH, XRP, SOL, ADA..."
+                    className="w-full bg-background border-2 border-primary/30 rounded-2xl px-6 py-4 text-xl font-black uppercase tracking-wide text-primary placeholder:text-muted-foreground/50 focus:outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all"
+                  />
+                  <datalist id="crypto-suggestions">
+                    {stats.assets.map((asset) => (
+                      <option key={asset.coin_id} value={asset.symbol.toUpperCase()} />
+                    ))}
+                  </datalist>
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Currently selected:</span>
+                    <span className="px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-sm font-black uppercase tracking-wider text-primary">
+                      {selectedCoin.toUpperCase()}
+                    </span>
+                  </div>
+                  {stats.assets.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-border/30">
+                      <p className="text-xs font-bold text-muted-foreground mb-3">Quick select from your portfolio:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {stats.assets.slice(0, 8).map((asset) => (
+                          <button
+                            key={asset.coin_id}
+                            onClick={() => {
+                              setSelectedCoin(asset.coin_id);
+                              setChartSearch(asset.symbol.toUpperCase());
+                            }}
+                            className={`group flex items-center gap-2 px-3 py-2 rounded-xl border transition-all ${selectedCoin === asset.coin_id
+                              ? "bg-primary/10 border-primary/40 text-primary"
+                              : "bg-card/50 border-border/50 hover:border-primary/30 hover:bg-card/80"
+                              }`}
+                          >
+                            <img src={asset.image} alt="" className="w-5 h-5 rounded-full" />
+                            <span className="text-sm font-black uppercase">{asset.symbol}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Optional Question */}
+              <div className="space-y-3">
                 <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block">
-                  Your question (optional)
+                  Your specific question (optional)
                 </label>
                 <input
                   type="text"
                   value={analysisQuestion}
                   onChange={(e) => setAnalysisQuestion(e.target.value)}
-                  placeholder={`e.g. How does this affect ${selectedCoin.toUpperCase()} price?`}
-                  className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+                  placeholder={`e.g., "Will this news push ${selectedCoin.toUpperCase()} higher?" or "What's the likely price direction?"`}
+                  className="w-full bg-background border border-border rounded-2xl px-5 py-4 text-base font-medium placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Leave blank for a general market impact analysis including chart predictions and sentiment analysis.
+                </p>
               </div>
+
+              {/* Image Upload Area */}
               <div
-                onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-primary/50", "bg-card/80"); }}
-                onDragLeave={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-primary/50", "bg-card/80"); }}
+                onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-primary/50", "bg-card/80", "scale-[1.01]"); }}
+                onDragLeave={(e) => { e.preventDefault(); e.currentTarget.classList.remove("border-primary/50", "bg-card/80", "scale-[1.01]"); }}
                 onDrop={(e) => {
                   e.preventDefault();
-                  e.currentTarget.classList.remove("border-primary/50", "bg-card/80");
+                  e.currentTarget.classList.remove("border-primary/50", "bg-card/80", "scale-[1.01]");
                   const file = e.dataTransfer.files[0];
                   if (file) handleImageFile(file);
                 }}
-                className="border-2 border-dashed border-border rounded-3xl p-8 md:p-12 text-center transition-colors bg-card/30"
+                className="border-2 border-dashed border-border rounded-3xl p-10 md:p-16 text-center transition-all bg-card/30 hover:border-primary/30"
               >
                 {imagePreview ? (
-                  <div className="space-y-4">
-                    <img src={imagePreview} alt="Dropped" className="max-h-48 mx-auto rounded-2xl object-contain border border-border" />
+                  <div className="space-y-6">
+                    <div className="relative inline-block">
+                      <img src={imagePreview} alt="Uploaded content" className="max-h-64 mx-auto rounded-2xl object-contain border-2 border-border shadow-xl" />
+                      <div className="absolute -top-3 -right-3 bg-primary text-primary-foreground rounded-full p-2">
+                        <ImageIcon size={20} />
+                      </div>
+                    </div>
                     <div className="flex flex-wrap gap-3 justify-center">
                       <button
                         type="button"
                         onClick={runImageAnalysis}
                         disabled={analysisLoading}
-                        className="px-6 py-3 rounded-2xl bg-primary text-white font-black text-sm disabled:opacity-50"
+                        className="px-8 py-4 rounded-2xl bg-primary text-primary-foreground font-black text-base disabled:opacity-50 hover:opacity-90 transition-all active:scale-95 shadow-lg"
                       >
-                        {analysisLoading ? "Analyzing…" : "Get analysis"}
+                        {analysisLoading ? (
+                          <>
+                            <span className="inline-block animate-spin mr-2">⏳</span>
+                            Analyzing...
+                          </>
+                        ) : (
+                          "🔍 Analyze Image"
+                        )}
                       </button>
-                      <label className="px-6 py-3 rounded-2xl border border-border font-bold text-sm cursor-pointer hover:bg-card/50">
-                        Change image
+                      <label className="px-8 py-4 rounded-2xl border-2 border-border font-bold text-base cursor-pointer hover:bg-card/50 hover:border-primary/40 transition-all active:scale-95">
+                        📷 Change Image
                         <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageFile(f); e.target.value = ""; }} />
                       </label>
                       <button
                         type="button"
                         onClick={() => { setImagePreview(null); setImageBase64(null); setAnalysisResult(null); }}
-                        className="px-6 py-3 rounded-2xl text-muted-foreground hover:text-foreground text-sm font-bold"
+                        className="px-8 py-4 rounded-2xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 text-base font-bold transition-all active:scale-95"
                       >
-                        Clear
+                        🗑️ Clear
                       </button>
                     </div>
                   </div>
                 ) : (
                   <label className="cursor-pointer block">
-                    <ImageIcon className="mx-auto mb-4 text-muted-foreground" size={48} />
-                    <p className="font-bold text-foreground mb-1">Drop an image here or click to upload</p>
-                    <p className="text-sm text-muted-foreground">News, tweet, or article screenshot</p>
+                    <div className="mb-6 inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 text-primary">
+                      <ImageIcon size={40} />
+                    </div>
+                    <p className="font-black text-xl text-foreground mb-2">Drop an image here or click to upload</p>
+                    <p className="text-base text-muted-foreground mb-6">
+                      📊 Chart patterns • 📰 News articles • 🐦 Tweets • 📈 Technical analysis
+                    </p>
+                    <div className="inline-flex items-center gap-2 px-6 py-3 bg-primary/5 border border-primary/20 rounded-2xl text-sm font-bold text-primary">
+                      <span>Supported formats: JPG, PNG, WebP</span>
+                    </div>
                     <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageFile(f); e.target.value = ""; }} />
                   </label>
                 )}
               </div>
+
+              {/* Analysis Results */}
               {analysisResult && (
-                <div className="space-y-4 rounded-3xl border border-border bg-card/40 p-6">
-                  <h4 className="text-sm font-black uppercase tracking-widest text-muted-foreground">Summary</h4>
-                  <p className="text-foreground">{analysisResult.summary}</p>
-                  <h4 className="text-sm font-black uppercase tracking-widest text-primary mt-6">Impact on {selectedCoin.toUpperCase()}</h4>
-                  <p className="text-foreground">{analysisResult.impactOnCrypto}</p>
+                <div className="space-y-6 rounded-3xl border-2 border-primary/20 bg-gradient-to-br from-card/60 to-card/40 p-8 shadow-2xl">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-2xl">🤖</span>
+                    </div>
+                    <h4 className="text-lg font-black uppercase tracking-widest text-primary">AI Analysis Results</h4>
+                  </div>
+
+                  <div className="space-y-4 p-6 bg-background/50 rounded-2xl border border-border">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xl">📋</span>
+                      <h5 className="text-sm font-black uppercase tracking-widest text-muted-foreground">Summary</h5>
+                    </div>
+                    <p className="text-base leading-relaxed text-foreground">{analysisResult.summary}</p>
+                  </div>
+
+                  <div className="space-y-4 p-6 bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl border-2 border-primary/30">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xl">📊</span>
+                      <h5 className="text-sm font-black uppercase tracking-widest text-primary">
+                        Impact on {selectedCoin.toUpperCase()}
+                      </h5>
+                    </div>
+                    <p className="text-base leading-relaxed text-foreground font-medium">{analysisResult.impactOnCrypto}</p>
+                  </div>
+
+                  <div className="pt-4 border-t border-border/50">
+                    <p className="text-xs text-muted-foreground text-center">
+                      ⚠️ This analysis is AI-generated and should not be considered financial advice. Always do your own research.
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
@@ -959,15 +958,15 @@ const Dashboard = () => {
                             }
                           />
                         </td>
-                    <td className="px-3 py-2.5 align-middle text-right">
-                      <button
-                        type="button"
-                        onClick={() => removeTradeEntry("sells", row.id)}
-                        className="text-xs text-muted-foreground hover:text-destructive transition-colors"
-                      >
-                        ×
-                      </button>
-                    </td>
+                        <td className="px-3 py-2.5 align-middle text-right">
+                          <button
+                            type="button"
+                            onClick={() => removeTradeEntry("sells", row.id)}
+                            className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+                          >
+                            ×
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -1058,98 +1057,116 @@ const Dashboard = () => {
       </main>
 
       {/* Delete modal */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/95 backdrop-blur-xl" onClick={() => setDeleteTarget(null)} />
-          <div className="glass w-full max-w-md relative z-10 rounded-3xl p-8 border-destructive/40">
-            <div className="flex items-center justify-center w-24 h-24 bg-destructive/10 text-destructive rounded-full mx-auto mb-8 border border-destructive/20">
-              <AlertTriangle size={48} />
-            </div>
-            <h3 className="text-3xl font-black text-center mb-3">Confirm deletion</h3>
-            <p className="text-muted-foreground text-center text-lg mb-10">
-              Delete <span className="text-foreground font-black">{deleteTarget.name}</span>?
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => setDeleteTarget(null)}
-                className="px-8 py-5 bg-muted rounded-3xl font-black hover:bg-secondary transition-all border border-border"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  await deleteHolding(deleteTarget.id);
-                  setDeleteTarget(null);
-                }}
-                className="px-8 py-5 bg-destructive rounded-3xl font-black hover:opacity-90 transition-all text-destructive-foreground"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Add modal */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/90 backdrop-blur-lg" onClick={() => setIsAddModalOpen(false)} />
-          <div className="glass w-full max-w-2xl max-h-[80vh] relative z-10 rounded-3xl p-8 md:p-10 border-primary/20 flex flex-col">
-            <div className="flex items-center justify-between mb-10">
-              <h3 className="text-3xl font-black tracking-tight uppercase">Search crypto</h3>
-              <button onClick={() => setIsAddModalOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors p-2"><X size={32} /></button>
-            </div>
-            {!isPremium && holdings.length >= FREE_HOLDING_LIMIT && (
-              <div className="mb-6 p-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-sm text-destructive">
-                <p className="font-bold">In the free plan you can track only one crypto.</p>
+      {
+        deleteTarget && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-background/95 backdrop-blur-xl" onClick={() => setDeleteTarget(null)} />
+            <div className="glass w-full max-w-md relative z-10 rounded-3xl p-8 border-destructive/40">
+              <div className="flex items-center justify-center w-24 h-24 bg-destructive/10 text-destructive rounded-full mx-auto mb-8 border border-destructive/20">
+                <AlertTriangle size={48} />
+              </div>
+              <h3 className="text-3xl font-black text-center mb-3">Confirm deletion</h3>
+              <p className="text-muted-foreground text-center text-lg mb-10">
+                Delete <span className="text-foreground font-black">{deleteTarget.name}</span>?
+              </p>
+              <div className="grid grid-cols-2 gap-4">
                 <button
-                  onClick={() => {
-                    setIsAddModalOpen(false);
-                    setActiveTab("settings");
-                  }}
-                  className="text-primary font-black underline mt-1"
+                  onClick={() => setDeleteTarget(null)}
+                  className="px-8 py-5 bg-muted rounded-3xl font-black hover:bg-secondary transition-all border border-border"
                 >
-                  Upgrade to Premium →
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    await deleteHolding(deleteTarget.id);
+                    setDeleteTarget(null);
+                  }}
+                  className="px-8 py-5 bg-destructive rounded-3xl font-black hover:opacity-90 transition-all text-destructive-foreground"
+                >
+                  Delete
                 </button>
               </div>
-            )}
-            <div className="relative mb-6">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground" size={24} />
-              <input
-                type="text"
-                placeholder="BTC, ETH, XRP, SOL..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-background border-2 border-border rounded-3xl py-6 pl-16 pr-8 text-xl font-bold focus:ring-4 focus:ring-primary/20 outline-none focus:border-primary transition-all placeholder:text-muted-foreground/40"
-                autoFocus
-              />
-            </div>
-            <div className="space-y-4 max-h-[55vh] overflow-y-auto pr-3 thin-scroll">
-              {top50.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.symbol.toLowerCase().includes(searchQuery.toLowerCase())).map((coin) => (
-                <button
-                  key={coin.id}
-                  onClick={() => handleAdd(coin)}
-                  className="w-full flex items-center justify-between p-6 rounded-3xl bg-card/50 border border-border hover:border-primary hover:bg-primary/5 transition-all text-left group"
-                >
-                  <div className="flex items-center gap-5">
-                    <img src={coin.image} alt="" className="w-12 h-12 rounded-full ring-2 ring-border" />
-                    <div>
-                      <div className="font-black text-lg">{coin.name}</div>
-                      <div className="text-xs text-muted-foreground uppercase font-black tracking-widest">{coin.symbol}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-lg font-black font-mono">{formatCurrency(coin.current_price)}</div>
-                    <div className="text-[10px] text-primary font-black uppercase opacity-0 group-hover:opacity-100 mt-1 tracking-widest">
-                      + Add
-                    </div>
-                  </div>
-                </button>
-              ))}
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
+
+      {/* Add modal */}
+      {/* Add modal */}
+      {
+        isAddModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsAddModalOpen(false)} />
+            <div className="w-full max-w-[420px] bg-[#09090b]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+
+              {/* Header & Input */}
+              <div className="p-4 border-b border-white/5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">Add Asset</h3>
+                  <button onClick={() => setIsAddModalOpen(false)} className="text-muted-foreground hover:text-white transition-colors p-1 hover:bg-white/5 rounded-lg"><X size={14} /></button>
+                </div>
+
+                {!isPremium && holdings.length >= FREE_HOLDING_LIMIT && (
+                  <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400">
+                    <span className="text-[10px] font-bold">Free plan limit reached (1 asset).</span>
+                    <button
+                      onClick={() => {
+                        setIsAddModalOpen(false);
+                        setActiveTab("settings");
+                      }}
+                      className="text-[10px] font-black underline hover:text-red-300"
+                    >
+                      Upgrade
+                    </button>
+                  </div>
+                )}
+
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                  <input
+                    type="text"
+                    placeholder="Search visible assets..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-sm font-medium text-white placeholder:text-muted-foreground/50 outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all"
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              {/* List */}
+              <div className="max-h-[320px] overflow-y-auto p-2 space-y-1" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}>
+                {top50.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.symbol.toLowerCase().includes(searchQuery.toLowerCase())).map((coin) => (
+                  <button
+                    key={coin.id}
+                    onClick={() => handleAdd(coin)}
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-white/[0.04] transition-colors group text-left border border-transparent hover:border-white/[0.04]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <img src={coin.image} alt="" className="w-8 h-8 rounded-full ring-1 ring-white/10" />
+                      <div>
+                        <div className="font-bold text-sm text-white group-hover:text-primary transition-colors">{coin.name}</div>
+                        <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{coin.symbol}</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs font-bold text-white font-mono">{formatCurrency(coin.current_price)}</div>
+                      <div className="text-[9px] text-primary font-bold uppercase opacity-0 group-hover:opacity-100 transition-opacity tracking-wider">
+                        Select
+                      </div>
+                    </div>
+                  </button>
+                ))}
+                {top50.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.symbol.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                  <div className="py-8 text-center">
+                    <p className="text-xs text-muted-foreground">No assets found</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )
+      }
 
       {/* Mobile nav */}
       <nav className="fixed bottom-0 left-0 right-0 lg:hidden glass px-10 py-5 flex items-center justify-around z-40">
@@ -1163,7 +1180,7 @@ const Dashboard = () => {
           <Briefcase size={26} /><span className="text-[10px] font-black uppercase tracking-tighter">Assets</span>
         </button>
       </nav>
-    </div>
+    </div >
   );
 };
 

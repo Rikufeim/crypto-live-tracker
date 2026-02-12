@@ -17,6 +17,13 @@ export const TV_SYMBOLS: Record<string, string> = {
   ripple: "BINANCE:XRPUSDT",
   solana: "BINANCE:SOLUSDT",
   cardano: "BINANCE:ADAUSDT",
+  dogecoin: "BINANCE:DOGEUSDT",
+  polkadot: "BINANCE:DOTUSDT",
+  "avalanche-2": "BINANCE:AVAXUSDT",
+  chainlink: "BINANCE:LINKUSDT",
+  "matic-network": "BINANCE:MATICUSDT",
+  litecoin: "BINANCE:LTCUSDT",
+  uniswap: "BINANCE:UNIUSDT",
 };
 
 export const FREE_HOLDING_LIMIT = 1;
