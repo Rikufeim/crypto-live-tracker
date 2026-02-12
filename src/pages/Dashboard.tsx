@@ -16,6 +16,7 @@ import {
   Globe, Shield, Info, ChevronRight, Crown, ImageIcon, LayoutGrid, Menu, LogOut,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import logoImg from "@/assets/logo.png";
 
 type TradeEntry = {
   id: string;
@@ -375,9 +376,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between h-14 px-4 md:px-6">
           {/* Left: Logo + Nav links */}
           <div className="flex items-center gap-6">
-            <span className="text-lg font-black tracking-tight flex-shrink-0">
-              LIVE<span className="text-[#2DD4A0]">TRACK</span>
-            </span>
+            <img src={logoImg} alt="LiveTrack" className="h-7 flex-shrink-0" />
 
             {/* Desktop nav links */}
             <div className="hidden md:flex items-center gap-1">

@@ -6,6 +6,7 @@ import {
 "lucide-react";
 import { STRIPE_CONFIG } from "@/lib/constants";
 import { AuthStarsBackground } from "@/components/ui/auth-stars-background";
+import logoImg from "@/assets/logo.png";
 
 const features = [
 { icon: Zap, title: "One-second updates", desc: "Real-time price tracking with 1s refresh." },
@@ -26,9 +27,7 @@ const Landing = () => {
         <section className="min-h-screen flex flex-col pt-6 pb-20 px-6 text-center">
         <nav className="w-full flex items-center justify-between flex-shrink-0 px-6 md:px-8 lg:px-10">
           <div className="flex items-center gap-3">
-            <span className="text-xl font-black tracking-tighter">
-              LIVE<span className="text-primary">TRACK</span>
-            </span>
+            <img src={logoImg} alt="LiveTrack" className="h-8" />
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -183,10 +182,7 @@ const Landing = () => {
         <footer className="py-10 px-6 border-t border-border">
           <div className="max-w-6xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <Activity size={16} className="text-primary" />
-              <span className="font-bold text-white">
-                LIVE<span className="text-primary">TRACK</span>
-              </span>
+              <img src={logoImg} alt="LiveTrack" className="h-6" />
             </div>
             <span>© {new Date().getFullYear()} LIVE<span className="text-primary">TRACK</span>. All rights reserved.</span>
           </div>
