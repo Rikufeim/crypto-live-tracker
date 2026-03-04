@@ -72,7 +72,7 @@ const Auth = () => {
           </button>
         </div>
         <div className="flex-1 flex justify-center">
-          <Logo className="h-14 md:h-20" />
+          <Logo className="h-20 md:h-28" />
         </div>
         <div className="flex-1 flex justify-end" />
       </div>
