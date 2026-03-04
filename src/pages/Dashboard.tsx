@@ -376,7 +376,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between h-14 px-4 md:px-6">
           {/* Left: Logo + Nav links */}
           <div className="flex items-center gap-6">
-            <Logo className="text-3xl md:text-4xl flex-shrink-0" />
+            <Logo className="h-12 md:h-16 flex-shrink-0" />
 
             {/* Desktop nav links */}
             <div className="hidden md:flex items-center gap-1">
