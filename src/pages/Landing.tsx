@@ -28,7 +28,7 @@ const Landing = () => {
         <section className="min-h-screen flex flex-col pt-6 pb-20 px-6 text-center">
           <nav className="w-full flex items-center justify-between flex-shrink-0 px-6 md:px-8 lg:px-10">
             <div className="flex items-center gap-3">
-              <Logo className="h-14 md:h-20" />
+              <Logo className="h-20 md:h-28" />
             </div>
             <div className="flex items-center gap-3">
               <button
@@ -183,7 +183,7 @@ const Landing = () => {
         <footer className="py-10 px-6 border-t border-border">
           <div className="max-w-6xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <Logo className="h-10 md:h-14" />
+              <Logo className="h-14 md:h-20" />
             </div>
             <span>© {new Date().getFullYear()} Multiply. All rights reserved.</span>
           </div>
