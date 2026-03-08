@@ -350,7 +350,7 @@ const Dashboard = () => {
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout");
       if (error) throw error;
-      if (data?.url) window.open(data.url, "_blank");
+      if (data?.url) window.location.href = data.url;
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     }
@@ -360,7 +360,7 @@ const Dashboard = () => {
     try {
       const { data, error } = await supabase.functions.invoke("customer-portal");
       if (error) throw error;
-      if (data?.url) window.open(data.url, "_blank");
+      if (data?.url) window.location.href = data.url;
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     }
@@ -500,7 +500,7 @@ const Dashboard = () => {
 
       {/* Main */}
       <main
-        className={`flex-1 flex flex-col ${(activeTab === 'dashboard' || activeTab === 'multitracker') ? 'h-[calc(100vh-56px)] overflow-hidden' : 'pb-20 lg:pb-10 min-h-[calc(100vh-56px)] bg-transparent'}`}
+        className={`flex-1 flex flex-col min-h-0 ${(activeTab === 'dashboard' || activeTab === 'multitracker') ? 'h-[calc(100vh-56px)] overflow-hidden' : 'pb-20 lg:pb-10 min-h-[calc(100vh-56px)] overflow-y-auto bg-transparent'}`}
       >
         <header className={`sticky top-0 z-[60] px-8 py-6 flex items-center justify-end bg-background/0 pointer-events-none ${(activeTab === "multitracker") ? "hidden" : ""}`}>
           <div className="flex items-center gap-4 pointer-events-auto">
