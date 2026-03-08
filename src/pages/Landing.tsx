@@ -9,10 +9,10 @@ import { AuthStarsBackground } from "@/components/ui/auth-stars-background";
 import { Logo } from "@/components/Logo";
 
 const features = [
-  { icon: Zap, title: "Sekunnin päivitykset", desc: "Reaaliaikainen hintaseuranta 1 sekunnin päivitysvälillä." },
-  { icon: TrendingUp, title: "TradingView-kaaviot", desc: "Ammattitason kaaviot suoraan sovelluksessa." },
-  { icon: Shield, title: "Pilvisynkronointi", desc: "Portfoliosi on aina turvassa ja synkronoituna." },
-  { icon: Globe, title: "Portfolio tracker", desc: "Seuraa suosikkejasi yhdellä hallintapaneelilla." },
+  { icon: Zap, title: "1-Second Updates", desc: "Real-time price tracking with 1-second refresh intervals." },
+  { icon: TrendingUp, title: "TradingView Charts", desc: "Professional-grade charts built right into the app." },
+  { icon: Shield, title: "Cloud Sync", desc: "Your portfolio is always safe and synced across devices." },
+  { icon: Globe, title: "Portfolio Tracker", desc: "Track all your favorites from a single dashboard." },
 ];
 
 const supportedCryptos = [
@@ -23,24 +23,24 @@ const supportedCryptos = [
 
 const faqs = [
   {
-    q: "Mikä on Multiply?",
-    a: "Multiply on krypto portfolio tracker, jolla seuraat kryptovaluuttojesi arvoa reaaliajassa. Sovellus tukee Bitcoinia, Ethereumia, Solanaa ja kaikkia suosittuja kryptoja."
+    q: "What is Multiply?",
+    a: "Multiply is a crypto portfolio tracker that lets you monitor the value of your cryptocurrencies in real time. The app supports Bitcoin, Ethereum, Solana, and all popular cryptos."
   },
   {
-    q: "Onko Multiply ilmainen?",
-    a: "Kyllä! Multiply on ilmainen yhden krypton seurantaan. Premium-tilaus (19€/kk) avaa rajattoman seurannan, portfolio trackerin ja prioriteettituen."
+    q: "Is Multiply free?",
+    a: "Yes! Multiply is free to track one crypto. The Premium plan (€19/mo) unlocks unlimited tracking, a full portfolio tracker, and priority support."
   },
   {
-    q: "Mitä kryptovaluuttoja voin seurata?",
-    a: "Voit seurata kaikkia suosittuja kryptoja: Bitcoin, Ethereum, Solana, XRP, Cardano, Dogecoin, Polkadot, Avalanche, Chainlink, Litecoin ja Uniswap."
+    q: "Which cryptocurrencies can I track?",
+    a: "You can track all popular cryptocurrencies: Bitcoin, Ethereum, Solana, XRP, Cardano, Dogecoin, Polkadot, Avalanche, Chainlink, Litecoin, and Uniswap."
   },
   {
-    q: "Miten reaaliaikainen seuranta toimii?",
-    a: "Multiply päivittää kryptojen hinnat sekunnin välein käyttäen luotettavia markkinadata-rajapintoja ja TradingView-kaavioita."
+    q: "How does real-time tracking work?",
+    a: "Multiply updates crypto prices every second using reliable market data APIs and TradingView charts."
   },
   {
-    q: "Onko tietoni turvassa?",
-    a: "Kyllä. Käytämme pilvisynkronointia ja turvallista autentikointia, joten portfoliosi on aina suojattu ja saatavilla."
+    q: "Is my data secure?",
+    a: "Yes. We use cloud sync and secure authentication, so your portfolio is always protected and accessible."
   }
 ];
 
@@ -54,7 +54,7 @@ const Landing = () => {
       <div className="relative z-10">
         {/* Hero */}
         <header className="min-h-screen flex flex-col pt-6 pb-20 px-6 text-center">
-          <nav className="w-full flex items-center justify-between flex-shrink-0 px-6 md:px-8 lg:px-10" aria-label="Päänavigaatio">
+          <nav className="w-full flex items-center justify-between flex-shrink-0 px-6 md:px-8 lg:px-10" aria-label="Main navigation">
             <div className="flex items-center gap-3">
               <Logo className="h-20 md:h-28" />
             </div>
@@ -62,57 +62,57 @@ const Landing = () => {
               <button
                 onClick={() => navigate("/auth")}
                 className="px-5 py-2.5 rounded-xl text-sm font-bold text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Kirjaudu sisään"
+                aria-label="Log in"
               >
-                Kirjaudu
+                Log in
               </button>
               <button
                 onClick={() => navigate("/auth")}
                 className="px-5 py-2.5 bg-primary text-white text-outline-soft rounded-xl text-sm font-black transition-all hover:opacity-90 active:scale-95"
-                aria-label="Aloita ilmaiseksi"
+                aria-label="Get started free"
               >
-                Aloita ilmaiseksi
+                Get Started Free
               </button>
             </div>
           </nav>
 
           <div className="flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full space-y-8">
             <h1 className="text-6xl md:text-7xl font-sans text-center font-medium tracking-wide leading-tight">
-              Krypto portfolio tracker
+              Crypto portfolio tracker
               <br />
-              <span className="text-gradient-brand">joka toimii reaaliajassa</span>
+              <span className="text-gradient-brand">that works in real time</span>
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Seuraa Bitcoin, Ethereum ja muita kryptovaluuttoja reaaliajassa. Ammattitason TradingView-kaaviot ja turvallinen pilvisynkronointi yhdessä sovelluksessa.
+              Track Bitcoin, Ethereum, and other cryptocurrencies in real time. Professional TradingView charts and secure cloud sync in one app.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <button
                 onClick={() => navigate("/auth")}
                 className="text-white text-outline-soft px-10 py-4 rounded-2xl text-lg font-black transition-all hover:opacity-90 active:scale-95 flex items-center gap-3 justify-center bg-primary"
-                aria-label="Aloita ilmaiseksi"
+                aria-label="Get started free"
               >
-                Aloita ilmaiseksi <ChevronRight size={20} />
+                Get Started Free <ChevronRight size={20} />
               </button>
               <a
-                href="#hinnoittelu"
+                href="#pricing"
                 className="bg-secondary text-secondary-foreground px-10 py-4 rounded-2xl text-lg font-bold transition-all hover:bg-muted flex items-center gap-2 justify-center"
               >
-                Katso hinnoittelu
+                View Pricing
               </a>
             </div>
           </div>
         </header>
 
         {/* Social proof / stats */}
-        <section className="py-12 px-6" aria-label="Tilastot">
+        <section className="py-12 px-6" aria-label="Statistics">
           <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
-              { value: "12+", label: "Tuettua kryptoa" },
-              { value: "1s", label: "Päivitysväli" },
-              { value: "24/7", label: "Reaaliaikainen" },
-              { value: "0€", label: "Aloitushinta" },
+              { value: "12+", label: "Supported Cryptos" },
+              { value: "1s", label: "Refresh Rate" },
+              { value: "24/7", label: "Real-Time" },
+              { value: "€0", label: "Starting Price" },
             ].map((s, i) => (
               <div key={i} className="glass rounded-2xl p-6">
                 <div className="text-3xl font-black text-primary">{s.value}</div>
@@ -123,13 +123,13 @@ const Landing = () => {
         </section>
 
         {/* Features */}
-        <section className="py-20 px-6" aria-labelledby="ominaisuudet-otsikko">
+        <section className="py-20 px-6" aria-labelledby="features-heading">
           <div className="max-w-5xl mx-auto">
-            <h2 id="ominaisuudet-otsikko" className="text-3xl md:text-4xl font-black tracking-tight text-center mb-4">
-              Kaikki mitä tarvitset krypto seurantaan
+            <h2 id="features-heading" className="text-3xl md:text-4xl font-black tracking-tight text-center mb-4">
+              Everything you need for crypto tracking
             </h2>
             <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
-              Multiply yhdistää reaaliaikaisen hintatiedon, ammattitason kaaviot ja turvallisen pilvisynkronoinnin yhteen helppokäyttöiseen sovellukseen.
+              Multiply combines real-time price data, professional charts, and secure cloud sync into one easy-to-use app.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {features.map((f, i) => (
@@ -149,13 +149,13 @@ const Landing = () => {
         </section>
 
         {/* Supported cryptos */}
-        <section className="py-16 px-6" aria-labelledby="tuetut-kryptot">
+        <section className="py-16 px-6" aria-labelledby="supported-cryptos">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 id="tuetut-kryptot" className="text-3xl md:text-4xl font-black tracking-tight mb-4">
-              Tuetut kryptovaluutat
+            <h2 id="supported-cryptos" className="text-3xl md:text-4xl font-black tracking-tight mb-4">
+              Supported Cryptocurrencies
             </h2>
             <p className="text-muted-foreground mb-10">
-              Seuraa suosituimpia kryptovaluuttoja yhdessä paikassa
+              Track the most popular cryptocurrencies in one place
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               {supportedCryptos.map((crypto, i) => (
@@ -171,16 +171,16 @@ const Landing = () => {
         </section>
 
         {/* How it works */}
-        <section className="py-20 px-6" aria-labelledby="miten-toimii">
+        <section className="py-20 px-6" aria-labelledby="how-it-works">
           <div className="max-w-4xl mx-auto">
-            <h2 id="miten-toimii" className="text-3xl md:text-4xl font-black tracking-tight text-center mb-12">
-              Näin pääset alkuun
+            <h2 id="how-it-works" className="text-3xl md:text-4xl font-black tracking-tight text-center mb-12">
+              How to Get Started
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { icon: Wallet, step: "1", title: "Luo tili", desc: "Rekisteröidy ilmaiseksi muutamassa sekunnissa." },
-                { icon: BarChart3, step: "2", title: "Lisää kryptot", desc: "Valitse seurattavat kryptovaluutat portfolioosi." },
-                { icon: Clock, step: "3", title: "Seuraa reaaliajassa", desc: "Näe hinnat, kaaviot ja portfolion arvo reaaliajassa." },
+                { icon: Wallet, step: "1", title: "Create Account", desc: "Sign up for free in just a few seconds." },
+                { icon: BarChart3, step: "2", title: "Add Cryptos", desc: "Choose which cryptocurrencies to track in your portfolio." },
+                { icon: Clock, step: "3", title: "Track in Real Time", desc: "See prices, charts, and portfolio value in real time." },
               ].map((item, i) => (
                 <article key={i} className="glass rounded-3xl p-8 text-center">
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4 text-xl font-black">
@@ -195,31 +195,31 @@ const Landing = () => {
         </section>
 
         {/* Pricing */}
-        <section id="hinnoittelu" className="py-20 px-6" aria-labelledby="hinnoittelu-otsikko">
+        <section id="pricing" className="py-20 px-6" aria-labelledby="pricing-heading">
           <div className="max-w-4xl mx-auto text-center mb-16">
-            <h2 id="hinnoittelu-otsikko" className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-              Selkeä hinnoittelu
+            <h2 id="pricing-heading" className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+              Simple Pricing
             </h2>
             <p className="text-muted-foreground text-lg">
-              Aloita ilmaiseksi, päivitä kun tarvitset enemmän.
+              Start for free, upgrade when you need more.
             </p>
           </div>
 
           <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Free */}
             <div className="glass rounded-3xl p-8 flex flex-col">
-              <h3 className="text-xl font-black mb-1">Ilmainen</h3>
+              <h3 className="text-xl font-black mb-1">Free</h3>
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-black">0€</span>
-                <span className="text-muted-foreground text-sm">/ikuisesti</span>
+                <span className="text-4xl font-black">€0</span>
+                <span className="text-muted-foreground text-sm">/forever</span>
               </div>
               <ul className="space-y-3 flex-1 mb-8">
                 {[
-                  { ok: true, text: "Seuraa 1 kryptoa" },
-                  { ok: true, text: "Reaaliaikaiset hinnat" },
-                  { ok: true, text: "TradingView-kaaviot" },
-                  { ok: true, text: "Pilvisynkronointi" },
-                  { ok: false, text: "Rajaton seuranta" },
+                  { ok: true, text: "Track 1 crypto" },
+                  { ok: true, text: "Real-time prices" },
+                  { ok: true, text: "TradingView charts" },
+                  { ok: true, text: "Cloud sync" },
+                  { ok: false, text: "Unlimited tracking" },
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-sm">
                     {item.ok ? (
@@ -237,7 +237,7 @@ const Landing = () => {
                 onClick={() => navigate("/auth")}
                 className="w-full py-3.5 rounded-2xl border border-border font-bold text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
               >
-                Aloita ilmaiseksi
+                Get Started Free
               </button>
             </div>
 
@@ -246,18 +246,18 @@ const Landing = () => {
               <h3 className="text-xl font-black mb-1">Premium</h3>
               <div className="flex items-baseline gap-1 mb-6">
                 <span className="text-4xl font-black">
-                  {STRIPE_CONFIG.premium.price}€
+                  €{STRIPE_CONFIG.premium.price}
                 </span>
                 <span className="text-muted-foreground text-sm">/{STRIPE_CONFIG.premium.interval}</span>
               </div>
               <ul className="space-y-3 flex-1 mb-8">
                 {[
                   "Portfolio tracker",
-                  "Rajaton krypto seuranta",
-                  "Reaaliaikaiset hinnat",
-                  "TradingView-kaaviot",
-                  "Pilvisynkronointi",
-                  "Prioriteettituki",
+                  "Unlimited crypto tracking",
+                  "Real-time prices",
+                  "TradingView charts",
+                  "Cloud sync",
+                  "Priority support",
                 ].map((text, i) => (
                   <li key={i} className="flex items-center gap-3 text-sm">
                     <Check size={16} className="text-primary" />
@@ -269,17 +269,17 @@ const Landing = () => {
                 onClick={() => navigate("/auth")}
                 className="w-full py-3.5 rounded-2xl bg-primary text-white text-outline-soft font-black transition-all hover:opacity-90 active:scale-[0.98]"
               >
-                Aloita Premium
+                Start Premium
               </button>
             </div>
           </div>
         </section>
 
         {/* FAQ */}
-        <section className="py-20 px-6" aria-labelledby="ukk-otsikko">
+        <section className="py-20 px-6" aria-labelledby="faq-heading">
           <div className="max-w-3xl mx-auto">
-            <h2 id="ukk-otsikko" className="text-3xl md:text-4xl font-black tracking-tight text-center mb-12">
-              Usein kysytyt kysymykset
+            <h2 id="faq-heading" className="text-3xl md:text-4xl font-black tracking-tight text-center mb-12">
+              Frequently Asked Questions
             </h2>
             <div className="space-y-4">
               {faqs.map((faq, i) => (
@@ -298,19 +298,19 @@ const Landing = () => {
         </section>
 
         {/* CTA */}
-        <section className="py-20 px-6 text-center" aria-label="Toimintakutsu">
+        <section className="py-20 px-6 text-center" aria-label="Call to action">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4">
-              Aloita kryptojesi seuranta tänään
+              Start tracking your crypto today
             </h2>
             <p className="text-muted-foreground mb-8">
-              Liity Multiply-käyttäjien joukkoon ja pidä krypto portfoliosi hallinnassa reaaliajassa.
+              Join Multiply users and keep your crypto portfolio under control in real time.
             </p>
             <button
               onClick={() => navigate("/auth")}
               className="text-white text-outline-soft px-10 py-4 rounded-2xl text-lg font-black transition-all hover:opacity-90 active:scale-95 bg-primary"
             >
-              Luo ilmainen tili
+              Create Free Account
             </button>
           </div>
         </section>
@@ -321,12 +321,12 @@ const Landing = () => {
             <div className="flex items-center gap-2">
               <Logo className="h-14 md:h-20" />
             </div>
-            <nav aria-label="Footer-linkit" className="flex gap-6">
-              <a href="#ominaisuudet-otsikko" className="hover:text-foreground transition-colors">Ominaisuudet</a>
-              <a href="#hinnoittelu" className="hover:text-foreground transition-colors">Hinnoittelu</a>
-              <a href="#ukk-otsikko" className="hover:text-foreground transition-colors">UKK</a>
+            <nav aria-label="Footer links" className="flex gap-6">
+              <a href="#features-heading" className="hover:text-foreground transition-colors">Features</a>
+              <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
+              <a href="#faq-heading" className="hover:text-foreground transition-colors">FAQ</a>
             </nav>
-            <span>© {new Date().getFullYear()} Multiply. Kaikki oikeudet pidätetään.</span>
+            <span>© {new Date().getFullYear()} Multiply. All rights reserved.</span>
           </div>
         </footer>
       </div>
