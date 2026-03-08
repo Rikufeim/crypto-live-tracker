@@ -47,7 +47,7 @@ export const TradingDashboard: React.FC<TradingDashboardProps> = ({
     const [watchlistTab, setWatchlistTab] = useState<'all' | 'favorites'>('all');
 
     return (
-        <div className="flex flex-col h-screen text-[#E8EAED] font-sans selection:bg-[#00E5A8]/30 overflow-y-auto relative bg-transparent" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex flex-col flex-1 min-h-0 text-[#E8EAED] font-sans selection:bg-[#00E5A8]/30 overflow-y-auto relative bg-transparent thin-scroll">
 
 
             {/* ═══════════════ FULL-WIDTH CHART ═══════════════ */}
