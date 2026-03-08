@@ -136,7 +136,7 @@ const Auth = () => {
         </form>
 
         <p className="text-center text-muted-foreground mt-6 text-sm">
-          {isLogin ? "Don’t have an account?" : "Already have an account?"}{" "}
+          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <button
             onClick={() => setIsLogin(!isLogin)}
             className="text-primary font-bold hover:underline"

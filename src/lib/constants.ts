@@ -5,7 +5,7 @@ export const STRIPE_CONFIG = {
     name: "Premium",
     price: 19,
     currency: "€",
-    interval: "kk",
+    interval: "mo",
   },
 } as const;
 
