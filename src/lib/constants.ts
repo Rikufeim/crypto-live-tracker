@@ -12,9 +12,9 @@ export const STRIPE_CONFIG = {
 export const API_BASE = "https://api.coingecko.com/api/v3";
 
 export const TV_SYMBOLS: Record<string, string> = {
+  ripple: "BINANCE:XRPUSDT",
   bitcoin: "BINANCE:BTCUSDT",
   ethereum: "BINANCE:ETHUSDT",
-  ripple: "BINANCE:XRPUSDT",
   solana: "BINANCE:SOLUSDT",
   cardano: "BINANCE:ADAUSDT",
   dogecoin: "BINANCE:DOGEUSDT",
