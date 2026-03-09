@@ -171,9 +171,9 @@ const Landing = () => {
         </section>
 
         {/* How it works */}
-        <section className="py-20 px-6" aria-labelledby="how-it-works">
+        <section className="py-12 md:py-20 px-4 md:px-6" aria-labelledby="how-it-works">
           <div className="max-w-4xl mx-auto">
-            <h2 id="how-it-works" className="text-3xl md:text-4xl font-black tracking-tight text-center mb-12">
+            <h2 id="how-it-works" className="text-2xl md:text-4xl font-black tracking-tight text-center mb-8 md:mb-12">
               How to Get Started
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
