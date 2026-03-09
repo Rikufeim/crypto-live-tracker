@@ -195,9 +195,9 @@ const Landing = () => {
         </section>
 
         {/* Pricing */}
-        <section id="pricing" className="py-20 px-6" aria-labelledby="pricing-heading">
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <h2 id="pricing-heading" className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+        <section id="pricing" className="py-12 md:py-20 px-4 md:px-6" aria-labelledby="pricing-heading">
+          <div className="max-w-4xl mx-auto text-center mb-10 md:mb-16">
+            <h2 id="pricing-heading" className="text-3xl md:text-5xl font-black tracking-tight mb-4">
               Simple Pricing
             </h2>
             <p className="text-muted-foreground text-lg">
