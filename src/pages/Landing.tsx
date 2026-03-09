@@ -298,9 +298,9 @@ const Landing = () => {
         </section>
 
         {/* CTA */}
-        <section className="py-20 px-6 text-center" aria-label="Call to action">
+        <section className="py-12 md:py-20 px-4 md:px-6 text-center" aria-label="Call to action">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4">
+            <h2 className="text-2xl md:text-4xl font-black tracking-tight mb-4">
               Start tracking your crypto today
             </h2>
             <p className="text-muted-foreground mb-8">
