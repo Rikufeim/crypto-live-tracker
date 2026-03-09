@@ -156,7 +156,7 @@ export const MinimalistDashboard: React.FC<MinimalistDashboardProps> = ({
             </div>
 
             {/* Crypto Selection */}
-            <div className="bg-card/40 border border-border/50 rounded-3xl p-6">
+            <div className="bg-card/40 border border-border/50 rounded-2xl md:rounded-3xl p-4 md:p-6">
                 <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-4">
                     Select Cryptocurrency
                 </div>
