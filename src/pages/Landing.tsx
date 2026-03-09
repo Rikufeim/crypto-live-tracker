@@ -205,9 +205,9 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {/* Free */}
-            <div className="glass rounded-3xl p-8 flex flex-col">
+            <div className="glass rounded-3xl p-6 md:p-8 flex flex-col">
               <h3 className="text-xl font-black mb-1">Free</h3>
               <div className="flex items-baseline gap-1 mb-6">
                 <span className="text-4xl font-black">€0</span>
