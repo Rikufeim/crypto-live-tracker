@@ -316,12 +316,12 @@ const Landing = () => {
         </section>
 
         {/* Footer */}
-        <footer className="py-10 px-6 border-t border-border">
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+        <footer className="py-8 md:py-10 px-4 md:px-6 border-t border-border">
+          <div className="max-w-6xl mx-auto flex flex-col items-center gap-4 text-xs md:text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <Logo className="h-14 md:h-20" />
+              <Logo className="h-12 md:h-20" />
             </div>
-            <nav aria-label="Footer links" className="flex gap-6">
+            <nav aria-label="Footer links" className="flex gap-4 md:gap-6">
               <a href="#features-heading" className="hover:text-foreground transition-colors">Features</a>
               <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
               <a href="#faq-heading" className="hover:text-foreground transition-colors">FAQ</a>
