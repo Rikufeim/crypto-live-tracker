@@ -97,7 +97,7 @@ export const MinimalistDashboard: React.FC<MinimalistDashboardProps> = ({
                         </div>
                     </div>
 
-                    <div className="text-3xl font-black tabular-nums">
+                    <div className="text-2xl md:text-3xl font-black tabular-nums">
                         {stats.assets.length}
                         <span className="text-sm font-normal text-muted-foreground ml-2">assets</span>
                     </div>
