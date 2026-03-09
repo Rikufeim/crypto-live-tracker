@@ -160,7 +160,7 @@ export const MinimalistDashboard: React.FC<MinimalistDashboardProps> = ({
                 <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-4">
                     Select Cryptocurrency
                 </div>
-                <div className="flex gap-3 flex-wrap">
+                <div className="flex gap-2 md:gap-3 flex-wrap">
                     {stats.assets.map((asset) => (
                         <button
                             key={asset.id}
