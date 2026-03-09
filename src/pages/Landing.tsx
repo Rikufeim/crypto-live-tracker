@@ -53,51 +53,51 @@ const Landing = () => {
 
       <div className="relative z-10">
         {/* Hero */}
-        <header className="min-h-screen flex flex-col pt-6 pb-20 px-6 text-center">
-          <nav className="w-full flex items-center justify-between flex-shrink-0 px-6 md:px-8 lg:px-10" aria-label="Main navigation">
+        <header className="min-h-screen flex flex-col pt-4 md:pt-6 pb-12 md:pb-20 px-4 md:px-6 text-center">
+          <nav className="w-full flex items-center justify-between flex-shrink-0 px-2 md:px-8 lg:px-10" aria-label="Main navigation">
             <div className="flex items-center gap-3">
-              <Logo className="h-20 md:h-28" />
+              <Logo className="h-14 md:h-28" />
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3">
               <button
                 onClick={() => navigate("/auth")}
-                className="px-5 py-2.5 rounded-xl text-sm font-bold text-muted-foreground hover:text-foreground transition-colors"
+                className="px-3 md:px-5 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-bold text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Log in"
               >
                 Log in
               </button>
               <button
                 onClick={() => navigate("/auth")}
-                className="px-5 py-2.5 bg-primary text-white text-outline-soft rounded-xl text-sm font-black transition-all hover:opacity-90 active:scale-95"
+                className="px-3 md:px-5 py-2 md:py-2.5 bg-primary text-white text-outline-soft rounded-xl text-xs md:text-sm font-black transition-all hover:opacity-90 active:scale-95"
                 aria-label="Get started free"
               >
-                Get Started Free
+                Get Started
               </button>
             </div>
           </nav>
 
-          <div className="flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full space-y-8">
-            <h1 className="text-6xl md:text-7xl font-sans text-center font-medium tracking-wide leading-tight">
+          <div className="flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full space-y-6 md:space-y-8 px-2">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-sans text-center font-medium tracking-wide leading-[1.15]">
               Crypto portfolio tracker
               <br />
               <span className="text-gradient-brand">that works in real time</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Track Bitcoin, Ethereum, and other cryptocurrencies in real time. Professional TradingView charts and secure cloud sync in one app.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center pt-2 md:pt-4">
               <button
                 onClick={() => navigate("/auth")}
-                className="text-white text-outline-soft px-10 py-4 rounded-2xl text-lg font-black transition-all hover:opacity-90 active:scale-95 flex items-center gap-3 justify-center bg-primary"
+                className="text-white text-outline-soft px-8 md:px-10 py-3.5 md:py-4 rounded-2xl text-base md:text-lg font-black transition-all hover:opacity-90 active:scale-95 flex items-center gap-3 justify-center bg-primary"
                 aria-label="Get started free"
               >
                 Get Started Free <ChevronRight size={20} />
               </button>
               <a
                 href="#pricing"
-                className="bg-secondary text-secondary-foreground px-10 py-4 rounded-2xl text-lg font-bold transition-all hover:bg-muted flex items-center gap-2 justify-center"
+                className="bg-secondary text-secondary-foreground px-8 md:px-10 py-3.5 md:py-4 rounded-2xl text-base md:text-lg font-bold transition-all hover:bg-muted flex items-center gap-2 justify-center"
               >
                 View Pricing
               </a>
