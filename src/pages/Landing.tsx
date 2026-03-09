@@ -106,17 +106,17 @@ const Landing = () => {
         </header>
 
         {/* Social proof / stats */}
-        <section className="py-12 px-6" aria-label="Statistics">
-          <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <section className="py-8 md:py-12 px-4 md:px-6" aria-label="Statistics">
+          <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 text-center">
             {[
               { value: "12+", label: "Supported Cryptos" },
               { value: "1s", label: "Refresh Rate" },
               { value: "24/7", label: "Real-Time" },
               { value: "€0", label: "Starting Price" },
             ].map((s, i) => (
-              <div key={i} className="glass rounded-2xl p-6">
-                <div className="text-3xl font-black text-primary">{s.value}</div>
-                <div className="text-sm text-muted-foreground mt-1">{s.label}</div>
+              <div key={i} className="glass rounded-2xl p-4 md:p-6">
+                <div className="text-2xl md:text-3xl font-black text-primary">{s.value}</div>
+                <div className="text-xs md:text-sm text-muted-foreground mt-1">{s.label}</div>
               </div>
             ))}
           </div>
