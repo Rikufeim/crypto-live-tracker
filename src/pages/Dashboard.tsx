@@ -524,7 +524,7 @@ const Dashboard = () => {
           </div>
         </header>
 
-        <div className={(activeTab === "dashboard" || activeTab === "multitracker") ? "flex-1 flex flex-col overflow-hidden relative z-0" : "p-4 md:p-8 w-full space-y-10 relative z-0"}>
+        <div className={(activeTab === "dashboard" || activeTab === "multitracker") ? "flex-1 flex flex-col overflow-hidden relative z-0" : "p-3 md:p-8 w-full space-y-6 md:space-y-10 relative z-0"}>
           {activeTab === "dashboard" && (
             <TradingDashboard
               stats={stats}
