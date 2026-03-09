@@ -37,7 +37,7 @@ export const MinimalistDashboard: React.FC<MinimalistDashboardProps> = ({
             {/* Main Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {/* Live Price Card */}
-                <div className="bg-card/40 border border-border/50 rounded-3xl p-6 space-y-4">
+                <div className="bg-card/40 border border-border/50 rounded-2xl md:rounded-3xl p-4 md:p-6 space-y-3 md:space-y-4">
                     <div className="flex items-center justify-between">
                         <div className="text-xs font-black uppercase tracking-widest text-muted-foreground">
                             Live {selectedCoin.toUpperCase()}
