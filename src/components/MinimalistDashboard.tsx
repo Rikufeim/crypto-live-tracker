@@ -48,7 +48,7 @@ export const MinimalistDashboard: React.FC<MinimalistDashboardProps> = ({
                         </div>
                     </div>
 
-                    <div className="text-3xl font-black tabular-nums">
+                    <div className="text-2xl md:text-3xl font-black tabular-nums">
                         {formatCurrency(stats.totalValue)}
                     </div>
 
