@@ -502,14 +502,14 @@ const Dashboard = () => {
       <main
         className={`flex-1 flex flex-col min-h-0 ${(activeTab === 'dashboard' || activeTab === 'multitracker') ? 'h-[calc(100vh-56px)] overflow-hidden' : 'pb-20 lg:pb-10 min-h-[calc(100vh-56px)] overflow-y-auto bg-transparent'}`}
       >
-        <header className={`sticky top-0 z-[60] px-8 py-6 flex items-center justify-end bg-background/0 pointer-events-none ${(activeTab === "multitracker") ? "hidden" : ""}`}>
-          <div className="flex items-center gap-4 pointer-events-auto">
+        <header className={`sticky top-0 z-[60] px-4 md:px-8 py-3 md:py-6 flex items-center justify-end bg-background/0 pointer-events-none ${(activeTab === "multitracker") ? "hidden" : ""}`}>
+          <div className="flex items-center gap-2 md:gap-4 pointer-events-auto">
             <div className="flex bg-[#09090b]/80 backdrop-blur-xl rounded-xl p-1 border border-white/10">
               {["USD", "EUR"].map((f) => (
                 <button
                   key={f}
                   onClick={() => setCurrency(f)}
-                  className={`px-5 py-2 rounded-lg text-[10px] font-black tracking-wider transition-all duration-300 ${currency === f ? "bg-[#00E5A8]/20 text-[#00E5A8]" : "text-white/40 hover:text-white"}`}
+                  className={`px-3 md:px-5 py-1.5 md:py-2 rounded-lg text-[10px] font-black tracking-wider transition-all duration-300 ${currency === f ? "bg-[#00E5A8]/20 text-[#00E5A8]" : "text-white/40 hover:text-white"}`}
                 >
                   {f}
                 </button>
@@ -517,14 +517,14 @@ const Dashboard = () => {
             </div>
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-[#00E5A8]/20 text-[#00E5A8] px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all hover:bg-[#00E5A8]/30 active:scale-95 border border-[#00E5A8]/20 hover:border-[#00E5A8]/40"
+              className="bg-[#00E5A8]/20 text-[#00E5A8] px-4 md:px-6 py-2 md:py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all hover:bg-[#00E5A8]/30 active:scale-95 border border-[#00E5A8]/20 hover:border-[#00E5A8]/40"
             >
               <Plus size={16} strokeWidth={3} /> Add
             </button>
           </div>
         </header>
 
-        <div className={(activeTab === "dashboard" || activeTab === "multitracker") ? "flex-1 flex flex-col overflow-hidden relative z-0" : "p-4 md:p-8 w-full space-y-10 relative z-0"}>
+        <div className={(activeTab === "dashboard" || activeTab === "multitracker") ? "flex-1 flex flex-col overflow-hidden relative z-0" : "p-3 md:p-8 w-full space-y-6 md:space-y-10 relative z-0"}>
           {activeTab === "dashboard" && (
             <TradingDashboard
               stats={stats}
@@ -544,9 +544,9 @@ const Dashboard = () => {
           )}
 
           {activeTab === "assets" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 w-full">
               {stats.assets.map((asset) => (
-                <div key={asset.id} className="glass rounded-3xl p-6 relative group hover:border-primary/30 transition-all cursor-pointer" onClick={() => setSelectedCoin(asset.coin_id)}>
+                <div key={asset.id} className="glass rounded-2xl md:rounded-3xl p-4 md:p-6 relative group hover:border-primary/30 transition-all cursor-pointer" onClick={() => setSelectedCoin(asset.coin_id)}>
                   <div className="flex justify-between items-start mb-8">
                     <div className="flex items-center gap-4">
                       <img src={asset.image} alt="" className="w-14 h-14 rounded-full ring-2 ring-border" />

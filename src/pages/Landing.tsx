@@ -53,51 +53,51 @@ const Landing = () => {
 
       <div className="relative z-10">
         {/* Hero */}
-        <header className="min-h-screen flex flex-col pt-6 pb-20 px-6 text-center">
-          <nav className="w-full flex items-center justify-between flex-shrink-0 px-6 md:px-8 lg:px-10" aria-label="Main navigation">
+        <header className="min-h-screen flex flex-col pt-4 md:pt-6 pb-12 md:pb-20 px-4 md:px-6 text-center">
+          <nav className="w-full flex items-center justify-between flex-shrink-0 px-2 md:px-8 lg:px-10" aria-label="Main navigation">
             <div className="flex items-center gap-3">
-              <Logo className="h-20 md:h-28" />
+              <Logo className="h-14 md:h-28" />
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3">
               <button
                 onClick={() => navigate("/auth")}
-                className="px-5 py-2.5 rounded-xl text-sm font-bold text-muted-foreground hover:text-foreground transition-colors"
+                className="px-3 md:px-5 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-bold text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Log in"
               >
                 Log in
               </button>
               <button
                 onClick={() => navigate("/auth")}
-                className="px-5 py-2.5 bg-primary text-white text-outline-soft rounded-xl text-sm font-black transition-all hover:opacity-90 active:scale-95"
+                className="px-3 md:px-5 py-2 md:py-2.5 bg-primary text-white text-outline-soft rounded-xl text-xs md:text-sm font-black transition-all hover:opacity-90 active:scale-95"
                 aria-label="Get started free"
               >
-                Get Started Free
+                Get Started
               </button>
             </div>
           </nav>
 
-          <div className="flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full space-y-8">
-            <h1 className="text-6xl md:text-7xl font-sans text-center font-medium tracking-wide leading-tight">
+          <div className="flex-1 flex flex-col justify-center max-w-4xl mx-auto w-full space-y-6 md:space-y-8 px-2">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-sans text-center font-medium tracking-wide leading-[1.15]">
               Crypto portfolio tracker
               <br />
               <span className="text-gradient-brand">that works in real time</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Track Bitcoin, Ethereum, and other cryptocurrencies in real time. Professional TradingView charts and secure cloud sync in one app.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center pt-2 md:pt-4">
               <button
                 onClick={() => navigate("/auth")}
-                className="text-white text-outline-soft px-10 py-4 rounded-2xl text-lg font-black transition-all hover:opacity-90 active:scale-95 flex items-center gap-3 justify-center bg-primary"
+                className="text-white text-outline-soft px-8 md:px-10 py-3.5 md:py-4 rounded-2xl text-base md:text-lg font-black transition-all hover:opacity-90 active:scale-95 flex items-center gap-3 justify-center bg-primary"
                 aria-label="Get started free"
               >
                 Get Started Free <ChevronRight size={20} />
               </button>
               <a
                 href="#pricing"
-                className="bg-secondary text-secondary-foreground px-10 py-4 rounded-2xl text-lg font-bold transition-all hover:bg-muted flex items-center gap-2 justify-center"
+                className="bg-secondary text-secondary-foreground px-8 md:px-10 py-3.5 md:py-4 rounded-2xl text-base md:text-lg font-bold transition-all hover:bg-muted flex items-center gap-2 justify-center"
               >
                 View Pricing
               </a>
@@ -106,26 +106,26 @@ const Landing = () => {
         </header>
 
         {/* Social proof / stats */}
-        <section className="py-12 px-6" aria-label="Statistics">
-          <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <section className="py-8 md:py-12 px-4 md:px-6" aria-label="Statistics">
+          <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 text-center">
             {[
               { value: "12+", label: "Supported Cryptos" },
               { value: "1s", label: "Refresh Rate" },
               { value: "24/7", label: "Real-Time" },
               { value: "€0", label: "Starting Price" },
             ].map((s, i) => (
-              <div key={i} className="glass rounded-2xl p-6">
-                <div className="text-3xl font-black text-primary">{s.value}</div>
-                <div className="text-sm text-muted-foreground mt-1">{s.label}</div>
+              <div key={i} className="glass rounded-2xl p-4 md:p-6">
+                <div className="text-2xl md:text-3xl font-black text-primary">{s.value}</div>
+                <div className="text-xs md:text-sm text-muted-foreground mt-1">{s.label}</div>
               </div>
             ))}
           </div>
         </section>
 
         {/* Features */}
-        <section className="py-20 px-6" aria-labelledby="features-heading">
+        <section className="py-12 md:py-20 px-4 md:px-6" aria-labelledby="features-heading">
           <div className="max-w-5xl mx-auto">
-            <h2 id="features-heading" className="text-3xl md:text-4xl font-black tracking-tight text-center mb-4">
+            <h2 id="features-heading" className="text-2xl md:text-4xl font-black tracking-tight text-center mb-4">
               Everything you need for crypto tracking
             </h2>
             <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
@@ -149,9 +149,9 @@ const Landing = () => {
         </section>
 
         {/* Supported cryptos */}
-        <section className="py-16 px-6" aria-labelledby="supported-cryptos">
+        <section className="py-10 md:py-16 px-4 md:px-6" aria-labelledby="supported-cryptos">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 id="supported-cryptos" className="text-3xl md:text-4xl font-black tracking-tight mb-4">
+            <h2 id="supported-cryptos" className="text-2xl md:text-4xl font-black tracking-tight mb-4">
               Supported Cryptocurrencies
             </h2>
             <p className="text-muted-foreground mb-10">
@@ -171,9 +171,9 @@ const Landing = () => {
         </section>
 
         {/* How it works */}
-        <section className="py-20 px-6" aria-labelledby="how-it-works">
+        <section className="py-12 md:py-20 px-4 md:px-6" aria-labelledby="how-it-works">
           <div className="max-w-4xl mx-auto">
-            <h2 id="how-it-works" className="text-3xl md:text-4xl font-black tracking-tight text-center mb-12">
+            <h2 id="how-it-works" className="text-2xl md:text-4xl font-black tracking-tight text-center mb-8 md:mb-12">
               How to Get Started
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -195,9 +195,9 @@ const Landing = () => {
         </section>
 
         {/* Pricing */}
-        <section id="pricing" className="py-20 px-6" aria-labelledby="pricing-heading">
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <h2 id="pricing-heading" className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+        <section id="pricing" className="py-12 md:py-20 px-4 md:px-6" aria-labelledby="pricing-heading">
+          <div className="max-w-4xl mx-auto text-center mb-10 md:mb-16">
+            <h2 id="pricing-heading" className="text-3xl md:text-5xl font-black tracking-tight mb-4">
               Simple Pricing
             </h2>
             <p className="text-muted-foreground text-lg">
@@ -205,9 +205,9 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {/* Free */}
-            <div className="glass rounded-3xl p-8 flex flex-col">
+            <div className="glass rounded-3xl p-6 md:p-8 flex flex-col">
               <h3 className="text-xl font-black mb-1">Free</h3>
               <div className="flex items-baseline gap-1 mb-6">
                 <span className="text-4xl font-black">€0</span>
@@ -242,7 +242,7 @@ const Landing = () => {
             </div>
 
             {/* Premium */}
-            <div className="glass rounded-3xl p-8 flex flex-col border-primary/30 relative overflow-hidden">
+            <div className="glass rounded-3xl p-6 md:p-8 flex flex-col border-primary/30 relative overflow-hidden">
               <h3 className="text-xl font-black mb-1">Premium</h3>
               <div className="flex items-baseline gap-1 mb-6">
                 <span className="text-4xl font-black">
@@ -276,9 +276,9 @@ const Landing = () => {
         </section>
 
         {/* FAQ */}
-        <section className="py-20 px-6" aria-labelledby="faq-heading">
+        <section className="py-12 md:py-20 px-4 md:px-6" aria-labelledby="faq-heading">
           <div className="max-w-3xl mx-auto">
-            <h2 id="faq-heading" className="text-3xl md:text-4xl font-black tracking-tight text-center mb-12">
+            <h2 id="faq-heading" className="text-2xl md:text-4xl font-black tracking-tight text-center mb-8 md:mb-12">
               Frequently Asked Questions
             </h2>
             <div className="space-y-4">
@@ -298,9 +298,9 @@ const Landing = () => {
         </section>
 
         {/* CTA */}
-        <section className="py-20 px-6 text-center" aria-label="Call to action">
+        <section className="py-12 md:py-20 px-4 md:px-6 text-center" aria-label="Call to action">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4">
+            <h2 className="text-2xl md:text-4xl font-black tracking-tight mb-4">
               Start tracking your crypto today
             </h2>
             <p className="text-muted-foreground mb-8">
@@ -316,12 +316,12 @@ const Landing = () => {
         </section>
 
         {/* Footer */}
-        <footer className="py-10 px-6 border-t border-border">
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+        <footer className="py-8 md:py-10 px-4 md:px-6 border-t border-border">
+          <div className="max-w-6xl mx-auto flex flex-col items-center gap-4 text-xs md:text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <Logo className="h-14 md:h-20" />
+              <Logo className="h-12 md:h-20" />
             </div>
-            <nav aria-label="Footer links" className="flex gap-6">
+            <nav aria-label="Footer links" className="flex gap-4 md:gap-6">
               <a href="#features-heading" className="hover:text-foreground transition-colors">Features</a>
               <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
               <a href="#faq-heading" className="hover:text-foreground transition-colors">FAQ</a>

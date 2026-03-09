@@ -35,9 +35,9 @@ export const MinimalistDashboard: React.FC<MinimalistDashboardProps> = ({
     return (
         <div className="space-y-8">
             {/* Main Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {/* Live Price Card */}
-                <div className="bg-card/40 border border-border/50 rounded-3xl p-6 space-y-4">
+                <div className="bg-card/40 border border-border/50 rounded-2xl md:rounded-3xl p-4 md:p-6 space-y-3 md:space-y-4">
                     <div className="flex items-center justify-between">
                         <div className="text-xs font-black uppercase tracking-widest text-muted-foreground">
                             Live {selectedCoin.toUpperCase()}
@@ -48,7 +48,7 @@ export const MinimalistDashboard: React.FC<MinimalistDashboardProps> = ({
                         </div>
                     </div>
 
-                    <div className="text-3xl font-black tabular-nums">
+                    <div className="text-2xl md:text-3xl font-black tabular-nums">
                         {formatCurrency(stats.totalValue)}
                     </div>
 
@@ -90,14 +90,14 @@ export const MinimalistDashboard: React.FC<MinimalistDashboardProps> = ({
                 </div>
 
                 {/* Balance Chart Card */}
-                <div className="bg-card/40 border border-border/50 rounded-3xl p-6 space-y-4">
+                <div className="bg-card/40 border border-border/50 rounded-2xl md:rounded-3xl p-4 md:p-6 space-y-3 md:space-y-4">
                     <div className="flex items-center justify-between">
                         <div className="text-xs font-black uppercase tracking-widest text-muted-foreground">
                             Balance
                         </div>
                     </div>
 
-                    <div className="text-3xl font-black tabular-nums">
+                    <div className="text-2xl md:text-3xl font-black tabular-nums">
                         {stats.assets.length}
                         <span className="text-sm font-normal text-muted-foreground ml-2">assets</span>
                     </div>
@@ -156,11 +156,11 @@ export const MinimalistDashboard: React.FC<MinimalistDashboardProps> = ({
             </div>
 
             {/* Crypto Selection */}
-            <div className="bg-card/40 border border-border/50 rounded-3xl p-6">
+            <div className="bg-card/40 border border-border/50 rounded-2xl md:rounded-3xl p-4 md:p-6">
                 <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-4">
                     Select Cryptocurrency
                 </div>
-                <div className="flex gap-3 flex-wrap">
+                <div className="flex gap-2 md:gap-3 flex-wrap">
                     {stats.assets.map((asset) => (
                         <button
                             key={asset.id}
