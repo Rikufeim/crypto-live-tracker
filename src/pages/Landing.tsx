@@ -276,9 +276,9 @@ const Landing = () => {
         </section>
 
         {/* FAQ */}
-        <section className="py-20 px-6" aria-labelledby="faq-heading">
+        <section className="py-12 md:py-20 px-4 md:px-6" aria-labelledby="faq-heading">
           <div className="max-w-3xl mx-auto">
-            <h2 id="faq-heading" className="text-3xl md:text-4xl font-black tracking-tight text-center mb-12">
+            <h2 id="faq-heading" className="text-2xl md:text-4xl font-black tracking-tight text-center mb-8 md:mb-12">
               Frequently Asked Questions
             </h2>
             <div className="space-y-4">
