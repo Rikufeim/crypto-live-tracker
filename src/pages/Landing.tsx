@@ -149,9 +149,9 @@ const Landing = () => {
         </section>
 
         {/* Supported cryptos */}
-        <section className="py-16 px-6" aria-labelledby="supported-cryptos">
+        <section className="py-10 md:py-16 px-4 md:px-6" aria-labelledby="supported-cryptos">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 id="supported-cryptos" className="text-3xl md:text-4xl font-black tracking-tight mb-4">
+            <h2 id="supported-cryptos" className="text-2xl md:text-4xl font-black tracking-tight mb-4">
               Supported Cryptocurrencies
             </h2>
             <p className="text-muted-foreground mb-10">
