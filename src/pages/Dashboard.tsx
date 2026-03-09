@@ -544,9 +544,9 @@ const Dashboard = () => {
           )}
 
           {activeTab === "assets" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 w-full">
               {stats.assets.map((asset) => (
-                <div key={asset.id} className="glass rounded-3xl p-6 relative group hover:border-primary/30 transition-all cursor-pointer" onClick={() => setSelectedCoin(asset.coin_id)}>
+                <div key={asset.id} className="glass rounded-2xl md:rounded-3xl p-4 md:p-6 relative group hover:border-primary/30 transition-all cursor-pointer" onClick={() => setSelectedCoin(asset.coin_id)}>
                   <div className="flex justify-between items-start mb-8">
                     <div className="flex items-center gap-4">
                       <img src={asset.image} alt="" className="w-14 h-14 rounded-full ring-2 ring-border" />
