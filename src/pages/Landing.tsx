@@ -123,9 +123,9 @@ const Landing = () => {
         </section>
 
         {/* Features */}
-        <section className="py-20 px-6" aria-labelledby="features-heading">
+        <section className="py-12 md:py-20 px-4 md:px-6" aria-labelledby="features-heading">
           <div className="max-w-5xl mx-auto">
-            <h2 id="features-heading" className="text-3xl md:text-4xl font-black tracking-tight text-center mb-4">
+            <h2 id="features-heading" className="text-2xl md:text-4xl font-black tracking-tight text-center mb-4">
               Everything you need for crypto tracking
             </h2>
             <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
